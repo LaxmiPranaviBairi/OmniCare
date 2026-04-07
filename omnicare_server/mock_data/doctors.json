@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Dr. Sarah Johnson",
+    "specialty": "Cardiologist",
+    "image": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
+    "rating": 4.9,
+    "reviews": 127,
+    "location": "Downtown Medical Center",
+    "status": "available",
+    "experience": "15 years"
+  },
+  {
+    "name": "Dr. Michael Chen",
+    "specialty": "Neurologist",
+    "image": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200&h=200&fit=crop&crop=face",
+    "rating": 4.8,
+    "reviews": 98,
+    "location": "City Health Hospital",
+    "status": "busy",
+    "experience": "12 years"
+  },
+  {
+    "name": "Dr. Emily Williams",
+    "specialty": "Pediatrician",
+    "image": "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=200&h=200&fit=crop&crop=face",
+    "rating": 4.9,
+    "reviews": 215,
+    "location": "Children's Care Clinic",
+    "status": "available",
+    "experience": "10 years"
+  },
+  {
+    "name": "Dr. James Wilson",
+    "specialty": "Orthopedic Surgeon",
+    "image": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200&h=200&fit=crop&crop=face",
+    "rating": 4.7,
+    "reviews": 89,
+    "location": "Metro Orthopedic Center",
+    "status": "high-demand",
+    "experience": "18 years"
+  },
+  {
+    "name": "Dr. Lisa Anderson",
+    "specialty": "Dermatologist",
+    "image": "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=200&h=200&fit=crop&crop=face",
+    "rating": 4.8,
+    "reviews": 156,
+    "location": "Skin Care Specialists",
+    "status": "available",
+    "experience": "8 years"
+  },
+  {
+    "name": "Dr. Robert Martinez",
+    "specialty": "General Physician",
+    "image": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=200&h=200&fit=crop&crop=face",
+    "rating": 4.6,
+    "reviews": 234,
+    "location": "Family Health Center",
+    "status": "busy",
+    "experience": "20 years"
+  },
+  {
+    "name": "Dr. Priya Sharma",
+    "specialty": "Gynecologist",
+    "image": "https://images.unsplash.com/photo-1527613426441-4da17471b66d?w=200&h=200&fit=crop&crop=face",
+    "rating": 4.9,
+    "reviews": 310,
+    "location": "Women's Health Clinic",
+    "status": "available",
+    "experience": "14 years"
+  },
+  {
+    "name": "Dr. Arun Patel",
+    "specialty": "Cardiologist",
+    "image": "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=200&h=200&fit=crop&crop=face",
+    "rating": 4.7,
+    "reviews": 172,
+    "location": "Heart Care Institute",
+    "status": "high-demand",
+    "experience": "22 years"
+  }
+]

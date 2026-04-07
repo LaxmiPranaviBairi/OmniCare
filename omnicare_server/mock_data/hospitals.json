@@ -1,0 +1,50 @@
+[
+  {
+    "name": "City General Hospital",
+    "location": "Downtown, Sector 1",
+    "load_percent": 82,
+    "status": "High Load",
+    "color": "bg-red-500",
+    "doctors_on_call": 18
+  },
+  {
+    "name": "Apollo Medical Center",
+    "location": "Westside, Sector 4",
+    "load_percent": 55,
+    "status": "Moderate",
+    "color": "bg-yellow-500",
+    "doctors_on_call": 12
+  },
+  {
+    "name": "Sunrise Health Clinic",
+    "location": "North District, Sector 7",
+    "load_percent": 30,
+    "status": "Available",
+    "color": "bg-green-500",
+    "doctors_on_call": 8
+  },
+  {
+    "name": "Metro Emergency Hospital",
+    "location": "Central Avenue, Sector 2",
+    "load_percent": 93,
+    "status": "Critical",
+    "color": "bg-red-500",
+    "doctors_on_call": 25
+  },
+  {
+    "name": "Green Valley Hospital",
+    "location": "Eastside, Sector 9",
+    "load_percent": 45,
+    "status": "Moderate",
+    "color": "bg-yellow-500",
+    "doctors_on_call": 10
+  },
+  {
+    "name": "Harmony Wellness Center",
+    "location": "Southside, Sector 6",
+    "load_percent": 20,
+    "status": "Available",
+    "color": "bg-green-500",
+    "doctors_on_call": 6
+  }
+]
