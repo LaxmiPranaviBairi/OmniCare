@@ -56,7 +56,7 @@ export function BookingModal({ isOpen, onClose, doctor }: BookingModalProps) {
     const checkSlots = async () => {
       try {
         const res = await fetch(
-          `http://127.0.0.1:5000/api/appointments/check?doctorName=${encodeURIComponent(doctor.name)}&date=${encodeURIComponent(selectedDate)}`
+          `https://omnicare-6244.onrender.com/api/appointments/check?doctorName=${encodeURIComponent(doctor.name)}&date=${encodeURIComponent(selectedDate)}`
         );
         if (res.ok) {
           const data = await res.json();
@@ -79,7 +79,7 @@ export function BookingModal({ isOpen, onClose, doctor }: BookingModalProps) {
       const userStr = localStorage.getItem("omnicare_user");
       const user = userStr ? JSON.parse(userStr) : { name: "John Doe" };
 
-      const res = await fetch("http://127.0.0.1:5000/api/appointments", {
+      const res = await fetch("https://omnicare-6244.onrender.com/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

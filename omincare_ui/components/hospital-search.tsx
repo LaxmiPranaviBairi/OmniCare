@@ -46,7 +46,7 @@ export function HospitalSearch() {
 
   useEffect(() => {
     if (selectedHospital) {
-      fetch(`http://127.0.0.1:5000/api/doctors?hospital=${encodeURIComponent(selectedHospital)}`)
+      fetch(`https://omnicare-6244.onrender.com/api/doctors?hospital=${encodeURIComponent(selectedHospital)}`)
         .then(res => res.json())
         .then(data => {
           console.log('Fetched doctors:', data);
@@ -64,7 +64,7 @@ export function HospitalSearch() {
 
   useEffect(() => {
     if (selectedDoctor && bookingDate) {
-      fetch(`http://127.0.0.1:5000/api/appointments/check?doctorName=${encodeURIComponent(selectedDoctor)}&date=${encodeURIComponent(bookingDate)}`)
+      fetch(`https://omnicare-6244.onrender.com/api/appointments/check?doctorName=${encodeURIComponent(selectedDoctor)}&date=${encodeURIComponent(bookingDate)}`)
         .then(res => res.json())
         .then(data => setBookedSlots(data))
         .catch(err => console.error("Failed to fetch booked slots", err));
@@ -79,7 +79,7 @@ export function HospitalSearch() {
       const userStr = localStorage.getItem('omnicare_user') || localStorage.getItem('user');
       const user = userStr ? JSON.parse(userStr) : { name: "Guest" };
 
-      const res = await fetch('http://127.0.0.1:5000/api/appointments', {
+      const res = await fetch('https://omnicare-6244.onrender.com/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -111,7 +111,7 @@ export function HospitalSearch() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://127.0.0.1:5000/api/hospitals');
+      const res = await fetch('https://omnicare-6244.onrender.com/api/hospitals');
       if (!res.ok) {
         throw new Error('Failed to fetch hospital data');
       }

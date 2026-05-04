@@ -48,7 +48,7 @@ export function BloodDonors() {
     try {
       const params = new URLSearchParams();
       if (searchQuery) params.set("search", searchQuery);
-      const res = await fetch(`http://127.0.0.1:5000/api/donors?${params.toString()}`);
+      const res = await fetch(`https://omnicare-6244.onrender.com/api/donors?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch donors");
       const data = await res.json();
       setDonors(data);
@@ -68,7 +68,7 @@ export function BloodDonors() {
     const safeId = donor._id || `mock-${donor.name}`;
     setRequestingId(safeId);
     try {
-      const res = await fetch("http://127.0.0.1:5000/api/blood-requests", {
+      const res = await fetch("https://omnicare-6244.onrender.com/api/blood-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ donorId: safeId, requesterName: "John Doe" }),
@@ -93,7 +93,7 @@ export function BloodDonors() {
     setIsRegistering(true);
     setRegisterError(null);
     try {
-      const res = await fetch("http://127.0.0.1:5000/api/donors/register", {
+      const res = await fetch("https://omnicare-6244.onrender.com/api/donors/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(registerForm),

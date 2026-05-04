@@ -39,7 +39,7 @@ export function DoctorSearch() {
       const params = new URLSearchParams();
       if (searchQuery) params.set("search", searchQuery);
       if (selectedSpecialty !== "All") params.set("specialty", selectedSpecialty);
-      const res = await fetch(`http://127.0.0.1:5000/api/doctors?${params.toString()}`);
+      const res = await fetch(`https://omnicare-6244.onrender.com/api/doctors?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch doctors");
       const data = await res.json();
       setDoctors(data);

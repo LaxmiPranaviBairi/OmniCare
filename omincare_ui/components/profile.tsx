@@ -79,7 +79,7 @@ export function Profile({ onNavigate }: ProfileProps) {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch("http://127.0.0.1:5000/api/profile");
+        const res = await fetch("https://omnicare-6244.onrender.com/api/profile");
         if (!res.ok) throw new Error("Failed to load profile");
         const data = await res.json();
         setProfile(data);

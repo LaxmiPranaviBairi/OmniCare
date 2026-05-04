@@ -38,7 +38,7 @@ export function Appointments() {
         }
       }
 
-      const res = await fetch(`http://127.0.0.1:5000/api/appointments?patientName=${encodeURIComponent(patientName)}`);
+      const res = await fetch(`https://omnicare-6244.onrender.com/api/appointments?patientName=${encodeURIComponent(patientName)}`);
       if (!res.ok) throw new Error("Failed to fetch appointments");
       const data = await res.json();
       setAppointments(data);

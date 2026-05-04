@@ -44,7 +44,7 @@ export default function DoctorDashboardPage() {
   const fetchAppointments = async (docName: string) => {
     try {
       console.log('Fetching roster for:', docName);
-      const res = await fetch(`http://localhost:5000/api/appointments/doctor?doctorName=${encodeURIComponent(docName)}`);
+      const res = await fetch(`https://omnicare-6244.onrender.com/api/appointments/doctor?doctorName=${encodeURIComponent(docName)}`);
       if (!res.ok) throw new Error("Failed to fetch appointments");
       const data = await res.json();
       setAppointments(data);
@@ -57,7 +57,7 @@ export default function DoctorDashboardPage() {
 
   const markCompleted = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/appointments/${id}/complete`, {
+      const res = await fetch(`https://omnicare-6244.onrender.com/api/appointments/${id}/complete`, {
         method: "PUT",
       });
       if (!res.ok) throw new Error("Failed to update status");

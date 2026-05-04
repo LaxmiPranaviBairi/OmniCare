@@ -29,7 +29,7 @@ export function DoctorDashboard({ onNavigate }: DoctorDashboardProps) {
     // Fetch the hospital details when component mounts
     const fetchHospital = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/hospitals');
+        const response = await fetch('https://omnicare-6244.onrender.com/api/hospitals');
         const data = await response.json();
         if (data && data.length > 0) {
           // Use the first hospital for this doctor's dashboard
@@ -51,7 +51,7 @@ export function DoctorDashboard({ onNavigate }: DoctorDashboardProps) {
     
     if (!hospitalId) return;
     try {
-      await fetch(`http://localhost:5000/api/hospitals/${hospitalId}/beds`, {
+      await fetch(`https://omnicare-6244.onrender.com/api/hospitals/${hospitalId}/beds`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ beds: newCount }),
@@ -74,7 +74,7 @@ export function DoctorDashboard({ onNavigate }: DoctorDashboardProps) {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/appointments');
+        const response = await fetch('https://omnicare-6244.onrender.com/api/appointments');
         const data = await response.json();
         setAppointments(data);
       } catch (err) {
@@ -95,7 +95,7 @@ export function DoctorDashboard({ onNavigate }: DoctorDashboardProps) {
     ));
 
     try {
-      await fetch(`http://localhost:5000/api/appointments/${identifier}/status`, {
+      await fetch(`https://omnicare-6244.onrender.com/api/appointments/${identifier}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
