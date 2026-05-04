@@ -5,18 +5,17 @@ import { Calendar, Clock, CheckCircle, AlertCircle, RefreshCw } from "lucide-rea
 
 interface Appointment {
   _id: string;
+  patientName: string;
+  hospital: string;
   doctorName: string;
-  doctorSpecialty: string;
-  doctorImage: string;
   date: string;
   time: string;
-  status: "confirmed" | "pending" | "cancelled";
+  status: "Pending" | "Completed";
 }
 
 const statusStyles = {
-  confirmed: "bg-green-100 text-green-700",
-  pending: "bg-yellow-100 text-yellow-700",
-  cancelled: "bg-red-100 text-red-600",
+  Completed: "bg-green-100 text-green-700",
+  Pending: "bg-yellow-100 text-yellow-700",
 };
 
 export function Appointments() {
@@ -28,7 +27,18 @@ export function Appointments() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch("http://127.0.0.1:5000/api/appointments?patientName=John Doe");
+      const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
+      let patientName = "Guest";
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          patientName = user.name || "Guest";
+        } catch (e) {
+          patientName = "Guest";
+        }
+      }
+
+      const res = await fetch(`http://127.0.0.1:5000/api/appointments?patientName=${encodeURIComponent(patientName)}`);
       if (!res.ok) throw new Error("Failed to fetch appointments");
       const data = await res.json();
       setAppointments(data);
@@ -105,31 +115,34 @@ export function Appointments() {
         {/* Appointment Cards */}
         {!isLoading && !error && appointments.length > 0 && (
           <div className="space-y-4">
-            {appointments.map((appt) => (
+            {appointments.map((appt, index) => (
               <div
-                key={appt._id}
+                key={appt._id || index}
                 className="bg-card rounded-2xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-4">
-                  <img
-                    src={appt.doctorImage}
-                    alt={appt.doctorName}
-                    className="w-14 h-14 rounded-2xl object-cover flex-shrink-0"
-                  />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <h3 className="font-semibold text-foreground truncate">{appt.doctorName}</h3>
-                      <span className={`px-2 py-0.5 text-xs font-bold rounded-full capitalize ${statusStyles[appt.status]}`}>
+                      <h3 className="font-semibold text-foreground truncate">
+                        {appt.hospital && !["Unknown Hospital", "N/A"].includes(appt.hospital) ? appt.hospital : "OmniCare Partner Clinic"}
+                      </h3>
+                      <span className={`px-2 py-0.5 text-xs font-bold rounded-full capitalize ${statusStyles[appt.status] || "bg-slate-100 text-slate-700"}`}>
                         {appt.status}
                       </span>
                     </div>
-                    <p className="text-sm text-primary font-medium mb-2">{appt.doctorSpecialty}</p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                    {appt.doctorName && (
+                      <p className="text-sm text-primary font-medium mb-2">
+                        {appt.doctorName.startsWith('Dr.') ? appt.doctorName : `Dr. ${appt.doctorName}`}
+                      </p>
+                    )}
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground mt-2">
+                      {appt.date && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" /> {appt.date}
+                        </span>
+                      )}
                       <span className="flex items-center gap-1">
-                        <Calendar className="h-3.5 w-3.5" /> {appt.date}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" /> {appt.time}
+                        <Clock className="h-4 w-4" /> {appt.time}
                       </span>
                     </div>
                   </div>

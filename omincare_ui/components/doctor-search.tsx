@@ -143,15 +143,15 @@ export function DoctorSearch() {
         {/* Doctor Cards */}
         {!isLoading && !error && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {doctors.map((doctor) => (
+            {doctors.map((doctor, index) => (
               <div
-                key={doctor._id}
+                key={doctor._id || doctor.name || index}
                 className="bg-card rounded-2xl border border-border p-4 shadow-sm hover:shadow-lg transition-shadow"
               >
                 <div className="flex gap-4">
                   <img
-                    src={doctor.image}
-                    alt={doctor.name}
+                    src={doctor.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.name || "Doctor")}&background=random`}
+                    alt={doctor.name || "Doctor"}
                     className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
@@ -159,13 +159,15 @@ export function DoctorSearch() {
                       <h3 className="font-semibold text-foreground truncate">{doctor.name}</h3>
                       <LiveStatusBadge status={doctor.status} showLabel={false} />
                     </div>
-                    <p className="text-sm text-primary font-medium mb-1">{doctor.specialty}</p>
-                    <p className="text-xs text-muted-foreground mb-2">{doctor.experience} experience</p>
+                    <p className="text-sm text-primary font-medium mb-1">{doctor.specialty || "General Medicine"}</p>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      {doctor.experience ? `${doctor.experience} experience` : 'Experience: N/A'}
+                    </p>
                     <div className="flex items-center gap-2 text-sm">
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                        <span className="font-medium text-foreground">{doctor.rating}</span>
-                        <span className="text-muted-foreground">({doctor.reviews})</span>
+                        <span className="font-medium text-foreground">{doctor.rating || 'New Doctor'}</span>
+                        {doctor.reviews ? <span className="text-muted-foreground">({doctor.reviews})</span> : null}
                       </div>
                     </div>
                   </div>

@@ -3,11 +3,11 @@
 type Status = "available" | "busy" | "high-demand";
 
 interface LiveStatusBadgeProps {
-  status: Status;
+  status: string;
   showLabel?: boolean;
 }
 
-const statusConfig: Record<Status, { color: string; bgColor: string; label: string }> = {
+const statusConfig: Record<string, { color: string; bgColor: string; label: string }> = {
   available: {
     color: "bg-green-500",
     bgColor: "bg-green-100",
@@ -26,13 +26,17 @@ const statusConfig: Record<Status, { color: string; bgColor: string; label: stri
 };
 
 export function LiveStatusBadge({ status, showLabel = true }: LiveStatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status?.toLowerCase()] || {
+    color: "bg-slate-500",
+    bgColor: "bg-slate-100",
+    label: status || "Unknown",
+  };
 
   return (
     <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full ${config.bgColor}`}>
       <span className={`h-2 w-2 rounded-full ${config.color} animate-pulse`} />
       {showLabel && (
-        <span className="text-xs font-medium text-foreground">{config.label}</span>
+        <span className="text-xs font-medium text-foreground capitalize">{config.label}</span>
       )}
     </div>
   );

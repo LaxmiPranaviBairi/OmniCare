@@ -1,0 +1,32 @@
+G. Narayanamma Institute of Technology & Science
+(Autonomous) (for women)
+Approved by AICTE, New Delhi & Affiliated to JNTUH, Hyderabad
+Accredited by NBA & NAAC, an ISO 9001:2015 Certified Institution
+Shaikpet, Hyderabad - 500104
+Department of CSE (AI & ML)
+
+GNR-22, (2025-2026) II B.Tech II Sem Mini Project-1
+on “OmniCare: A Comprehensive Healthcare Web Dashboard”
+
+Under the guidance of
+Mrs. T. Vanitha, Assistant Professor
+
+Abstract
+In modern healthcare ecosystems, the rapid and unimpeded access to medical resources such as specialized doctors, emergency hospital beds, and willing blood donors is absolutely critical for improving patient outcomes and saving lives. However, traditional healthcare IT infrastructure is heavily fragmented. Patients and their families frequently face immense difficulty navigating multiple, uncoordinated systems, leading to severe delays during emergencies. There is a pressing need for a unified system that bridges the gap between healthcare providers and patients. This mini-project presents "OmniCare," a centralized, highly responsive, and full-stack healthcare web application designed specifically to eliminate these bottlenecks by streamlining access to critical medical services through a single, intuitive interface.
+
+OmniCare is engineered utilizing modern web technologies, specifically harnessing the power of React.js (Next.js) for a lightning-fast frontend client and a Node.js/Express.js RESTful API backed by a NoSQL MongoDB database. The platform is built around four primary modules aimed at distinct healthcare hurdles. First, the Live Hospital Load Tracking module provides patients with real-time analytics regarding nearby hospital occupancy. By displaying live load percentages and current capacity statuses, it enables precise and rapid decision-making during severe medical emergencies, preventing the routing of critical patients to overcrowded facilities. 
+
+Second, the platform features an interactive Doctor Search and Appointment Booking module. Patients can filter healthcare professionals by specific medical specializations, view comprehensive profiles, and book available date and time slots through a seamless interface that instantly syncs with the remote backend database. Third, addressing the constant demand for emergency blood supplies, the application incorporates a localized Blood Donor Network. This system allows individuals in urgent need to filter registered donors geographically and by exact blood group, directly sending instant contribution requests rather than relying on unverified social channels. Finally, a robust Patient Profile dashboard ensures users have a digital hub to track their vital statistics and manage their historical appointment records.
+
+Ultimately, OmniCare successfully demonstrates how modern web application architectures can revolutionize patient care. By centralizing hospital availability, doctor scheduling, and blood donation networking into one cohesive and accessible dashboard, the application significantly enhances healthcare transparency, considerably decreases emergency response delays, and greatly improves the overall user experience for patients navigating the medical system.
+
+Keywords: Centralized Healthcare Dashboard, Appointment Booking API, Live Hospital Load Tracking, Localized Blood Donor Network, Patient Portal, React Web Application, RESTful Architecture, NoSQL Data Modeling.
+
+H/W Requirement:
+Laptop/PC, Internet Connection, Smartphone, Minimum 4GB RAM, Web Browser
+
+S/W Requirement:
+Windows OS, Node.js, Express.js, React.js (Next.js), Tailwind CSS, MongoDB, Mongoose, VS Code
+
+Sustainable Development Goals (SDGs):
+SDG 3: Good Health and Well-being, SDG 9: Industry, Innovation, and Infrastructure, SDG 10: Reduced Inequalities, SDG 11: Sustainable Cities and Communities

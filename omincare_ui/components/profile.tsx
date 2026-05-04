@@ -65,7 +65,11 @@ interface UserProfile {
   };
 }
 
-export function Profile() {
+interface ProfileProps {
+  onNavigate: (page: string) => void;
+}
+
+export function Profile({ onNavigate }: ProfileProps) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -191,16 +195,19 @@ export function Profile() {
               icon={User}
               label="My Profile"
               description="Edit your personal information"
+              onClick={() => onNavigate('edit-profile')}
             />
             <MenuItem
               icon={FileText}
               label="Medical Records"
               description="View your health history"
+              onClick={() => onNavigate('medical-records')}
             />
             <MenuItem
               icon={Calendar}
               label="My Appointments"
               description="Upcoming and past bookings"
+              onClick={() => onNavigate('appointments')}
             />
             <MenuItem
               icon={Bell}

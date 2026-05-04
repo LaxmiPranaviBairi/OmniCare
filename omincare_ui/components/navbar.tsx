@@ -1,12 +1,23 @@
 "use client"
 
-import { Activity, LayoutDashboard, Search, Hospital, Droplets, User } from "lucide-react"
+import { Activity, LayoutDashboard, Search, Hospital, Droplets, User, LogOut, Calendar } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface NavbarProps {
   onNavigate: (page: string) => void
 }
 
 export function Navbar({ onNavigate }: NavbarProps) {
+  const router = useRouter()
+
+  const handleLogout = () => {
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+    router.push('/login')
+  }
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
@@ -30,19 +41,38 @@ export function Navbar({ onNavigate }: NavbarProps) {
           <button onClick={() => onNavigate('hospitals')} className="transition-colors hover:text-primary flex items-center gap-1">
             <Hospital className="h-4 w-4" /> Hospitals
           </button>
+          <button onClick={() => onNavigate('appointments')} className="transition-colors hover:text-primary flex items-center gap-1">
+            <Calendar className="h-4 w-4" /> Appointments
+          </button>
           <button onClick={() => onNavigate('donors')} className="transition-colors hover:text-primary flex items-center gap-1">
             <Droplets className="h-4 w-4 text-red-500" /> Donors
           </button>
+          <div className="w-px h-6 bg-border mx-2 hidden md:block"></div>
+          <Link href="/doctor" className="transition-colors hover:text-primary flex items-center gap-1 font-semibold text-primary">
+            <User className="h-4 w-4" /> Doctor Portal
+          </Link>
         </div>
 
-        {/* Profile Button */}
-        <button 
-          onClick={() => onNavigate('profile')}
-          className="flex items-center gap-2 rounded-full border p-1 px-3 hover:bg-muted transition-colors"
-        >
-          <User className="h-4 w-4" />
-          <span className="text-xs">Profile</span>
-        </button>
+        {/* User Actions */}
+        <div className="flex items-center gap-2">
+          {/* Profile Button */}
+          <button 
+            onClick={() => onNavigate('profile')}
+            className="flex items-center gap-2 rounded-full border p-1 px-3 hover:bg-muted transition-colors"
+          >
+            <User className="h-4 w-4" />
+            <span className="text-xs">Profile</span>
+          </button>
+          
+          {/* Logout Button */}
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-2 rounded-full border p-1 px-3 hover:bg-red-50 text-red-500 border-red-100 transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="text-xs">Logout</span>
+          </button>
+        </div>
       </div>
     </nav>
   )

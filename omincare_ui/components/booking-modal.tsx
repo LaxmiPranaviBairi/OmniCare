@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Calendar, Clock, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -12,14 +12,12 @@ interface BookingModalProps {
     name: string;
     specialty: string;
     image: string;
+    location?: string;
+    hospital?: string;
   };
 }
 
-const timeSlots = [
-  "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM",
-  "11:00 AM", "11:30 AM", "02:00 PM", "02:30 PM",
-  "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM",
-];
+const timeSlots = ["10:00 AM", "11:30 AM", "02:00 PM", "04:00 PM"];
 
 // Generate next 5 weekdays dynamically
 function getUpcomingDates() {
@@ -45,11 +43,31 @@ function getUpcomingDates() {
 export function BookingModal({ isOpen, onClose, doctor }: BookingModalProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isBooked, setIsBooked] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const dates = getUpcomingDates();
+
+  useEffect(() => {
+    if (!selectedDate || !isOpen) return;
+
+    const checkSlots = async () => {
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:5000/api/appointments/check?doctorName=${encodeURIComponent(doctor.name)}&date=${encodeURIComponent(selectedDate)}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setBookedSlots(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch booked slots:", err);
+      }
+    };
+    checkSlots();
+  }, [selectedDate, isOpen, doctor.name]);
 
   if (!isOpen) return null;
 
@@ -58,15 +76,19 @@ export function BookingModal({ isOpen, onClose, doctor }: BookingModalProps) {
     setIsLoading(true);
     setError(null);
     try {
+      const userStr = localStorage.getItem("omnicare_user");
+      const user = userStr ? JSON.parse(userStr) : { name: "John Doe" };
+
       const res = await fetch("http://127.0.0.1:5000/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          doctorId: doctor._id,
+          doctorId: doctor._id || `mock-${doctor.name}`,
           doctorName: doctor.name,
           doctorSpecialty: doctor.specialty,
           doctorImage: doctor.image,
-          patientName: "John Doe", // replace with real user when auth is added
+          patientName: user.name,
+          hospital: doctor.hospital || doctor.location || "N/A",
           date: selectedDate,
           time: selectedTime,
         }),
@@ -80,6 +102,7 @@ export function BookingModal({ isOpen, onClose, doctor }: BookingModalProps) {
         setIsBooked(false);
         setSelectedDate(null);
         setSelectedTime(null);
+        setBookedSlots([]);
         onClose();
       }, 2200);
     } catch (err: any) {
@@ -126,7 +149,7 @@ export function BookingModal({ isOpen, onClose, doctor }: BookingModalProps) {
             {/* Doctor Info */}
             <div className="p-4 flex items-center gap-4 border-b border-border">
               <img
-                src={doctor.image}
+                src={doctor.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.name || "Doctor")}&background=random`}
                 alt={doctor.name}
                 className="w-14 h-14 rounded-2xl object-cover"
               />
@@ -146,7 +169,10 @@ export function BookingModal({ isOpen, onClose, doctor }: BookingModalProps) {
                 {dates.map((d) => (
                   <button
                     key={d.full}
-                    onClick={() => setSelectedDate(d.full)}
+                    onClick={() => {
+                      setSelectedDate(d.full);
+                      setSelectedTime(null);
+                    }}
                     className={`flex-shrink-0 flex flex-col items-center px-4 py-2 rounded-2xl border transition-colors ${
                       selectedDate === d.full
                         ? "bg-primary text-primary-foreground border-primary"
@@ -167,21 +193,33 @@ export function BookingModal({ isOpen, onClose, doctor }: BookingModalProps) {
                 <Clock className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium text-foreground">Select Time</span>
               </div>
-              <div className="grid grid-cols-3 gap-2">
-                {timeSlots.map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => setSelectedTime(time)}
-                    className={`px-3 py-2 text-sm rounded-2xl border transition-colors ${
-                      selectedTime === time
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-card border-border hover:border-primary"
-                    }`}
-                  >
-                    {time}
-                  </button>
-                ))}
-              </div>
+              {selectedDate ? (
+                <div className="grid grid-cols-2 gap-2">
+                  {timeSlots.map((time) => {
+                    const isTaken = bookedSlots.includes(time);
+                    return (
+                      <button
+                        key={time}
+                        onClick={() => !isTaken && setSelectedTime(time)}
+                        disabled={isTaken}
+                        className={`px-3 py-2 text-sm rounded-2xl border transition-colors ${
+                          isTaken
+                            ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-50"
+                            : selectedTime === time
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-card border-border hover:border-primary"
+                        }`}
+                      >
+                        {time} {isTaken && "(Booked)"}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground text-center py-2">
+                  Please select a date first
+                </div>
+              )}
             </div>
 
             {/* Error */}

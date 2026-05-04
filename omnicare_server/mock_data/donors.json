@@ -1,82 +1,82 @@
 [
   {
-    "name": "Alex Thompson",
+    "name": "Rahul Desai",
     "bloodGroup": "A+",
-    "location": "Downtown Area",
+    "location": "Kukatpally",
     "distance": "1.2 km",
     "lastDonation": "3 months ago",
     "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
     "available": true,
-    "phone": "+1 (555) 201-3344"
+    "phone": "+91 9876543210"
   },
   {
-    "name": "Maria Garcia",
+    "name": "Sneha Krishnan",
     "bloodGroup": "O-",
-    "location": "Westside District",
+    "location": "Madhapur",
     "distance": "2.5 km",
     "lastDonation": "4 months ago",
     "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
     "available": true,
-    "phone": "+1 (555) 304-5566"
+    "phone": "+91 8765432109"
   },
   {
-    "name": "David Kim",
+    "name": "Amit Kumar",
     "bloodGroup": "B+",
-    "location": "Midtown",
+    "location": "Ameerpet",
     "distance": "3.0 km",
     "lastDonation": "2 months ago",
     "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
     "available": true,
-    "phone": "+1 (555) 407-7788"
+    "phone": "+91 7654321098"
   },
   {
-    "name": "Sarah Wilson",
+    "name": "Neha Singh",
     "bloodGroup": "AB+",
-    "location": "Northside",
+    "location": "Kondapur",
     "distance": "4.1 km",
     "lastDonation": "5 months ago",
     "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
     "available": false,
-    "phone": "+1 (555) 510-9900"
+    "phone": "+91 6543210987"
   },
   {
-    "name": "James Brown",
+    "name": "Siddharth Verma",
     "bloodGroup": "O+",
-    "location": "Eastside",
+    "location": "Jubilee Hills",
     "distance": "2.8 km",
     "lastDonation": "6 months ago",
     "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
     "available": true,
-    "phone": "+1 (555) 613-1122"
+    "phone": "+91 9988776655"
   },
   {
-    "name": "Emily Davis",
+    "name": "Pooja Reddy",
     "bloodGroup": "A-",
-    "location": "Southside",
+    "location": "Secunderabad",
     "distance": "5.2 km",
     "lastDonation": "3 months ago",
     "image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
     "available": true,
-    "phone": "+1 (555) 716-3344"
+    "phone": "+91 8877665544"
   },
   {
-    "name": "Michael Lee",
+    "name": "Vijay Rao",
     "bloodGroup": "B-",
-    "location": "Central District",
+    "location": "Banjara Hills",
     "distance": "1.8 km",
     "lastDonation": "4 months ago",
     "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face",
     "available": true,
-    "phone": "+1 (555) 819-5566"
+    "phone": "+91 7766554433"
   },
   {
-    "name": "Jennifer Martinez",
+    "name": "Kavitha Iyer",
     "bloodGroup": "AB-",
-    "location": "Harbor Area",
+    "location": "Gachibowli",
     "distance": "6.0 km",
     "lastDonation": "2 months ago",
     "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face",
     "available": false,
-    "phone": "+1 (555) 922-7788"
+    "phone": "+91 6655443322"
   }
 ]

@@ -1,0 +1,65 @@
+======================================================
+OMNICARE PROJECT - PRESENTATION & REVIEW PANEL SCRIPTS
+======================================================
+
+Below are the scripts and answers you can use during your project review presentation. Remember to speak confidently and avoid reading word-for-word.
+
+------------------------------------------------------
+1. PRESENTING THE BLOCK DIAGRAM SLIDE
+------------------------------------------------------
+"Moving on to the system architecture, this block diagram illustrates the core data flow of the OmniCare HealthCare System. It follows a modern Client-Server RESTful architecture.
+
+Starting on the left, we have the React-based User Interface. This is the frontend that patients interact with. We have decoupled this into distinct modules: Find Doctors, Locate Beds, and Find Donors. When a user interacts with one of these features, a customized search request is sent over HTTP.
+
+These requests hit our Backend Processing Layer, built on Node.js and Express. This acts as our API router and Search Engine. We built an efficient filtering engine that parses the incoming requests—like matching specific blood groups or finding doctors by specialization.
+
+The backend then securely fetches the targeted data from our MongoDB database, which is broken down into specific collections:
+- For Hospital Info, it retrieves available beds and calculates the Live Load Percentage.
+- For the Blood Bank, it filters donors by exact location and blood availability.
+- For Doctor Details, it pulls up verified profiles, including availability and ratings.
+
+Sitting underneath all of this is our MERN Stack technology styled with Tailwind CSS, with GitHub handling our version control. As highlighted on the bottom, the system handles Real-Time Data and includes a fallback Offline Access mode—meaning if the database goes down, the Express server falls back to locally cached JSON data so the app never crashes."
+
+
+------------------------------------------------------
+2. PRESENTING THE "TECHNOLOGY USED" SLIDE
+------------------------------------------------------
+"To bring OmniCare to life, we chose to build on the MERN stack. We selected this specifically because it is a production-grade architecture known for its high performance and ability to handle real-time data, which is critical for healthcare emergencies.
+
+For the frontend, we used React.js (Next.js) to build a fast, dynamic user interface. To achieve that highly polished design, we utilized Tailwind CSS for our styling, paired with Lucide Icons to keep the visual language clean.
+
+Handling all of our data requests is our server-side layer, powered by Node.js and Express.js. This asynchronous API framework allows us to securely process doctor searches and hospital updates without blocking the main thread.
+
+For our data storage, we went with MongoDB, a NoSQL database. Because healthcare records can have varying structures, MongoDB gave us the flexibility we needed. We also implemented Mongoose ODM to enforce strict data schemas to prevent bad data from entering the system.
+
+Finally, to manage the entire lifecycle of the project, we adhered to industry-standard version control using Git and GitHub. This ensured our codebase was safely backed up and allowed for a seamless development workflow."
+
+
+------------------------------------------------------
+3. ANSWERING: "HOW DOES THE LOAD INDICATOR WORK?"
+------------------------------------------------------
+"The live load indicator works in three steps. 
+
+First, our React frontend fetches the real-time hospital occupancy data—including load percentage and a severity status—from our Node.js back-end via a RESTful API. 
+
+Second, we use a custom utility function in the code to map the severity level to specific Tailwind CSS color classes safely, preventing build errors. 
+
+Finally, to give it that 'live monitoring' feel, we attach a CSS keyframe animation called 'animate-pulse' to a span element, which constantly updates the UI alongside the exact percentage without using heavy JavaScript loops."
+
+
+------------------------------------------------------
+4. ANSWERING: "HOW DOES IT CALCULATE THE LOAD / WHERE IS DATA FROM?"
+------------------------------------------------------
+"Right now, for the purpose of this prototype MVP (Minimum Viable Product), the app does not mathematically calculate the load itself. Instead, the React frontend makes an API call to our Express.js backend, which retrieves the `load_percent` directly from our MongoDB database. 
+
+However, in a real-world deployment, OmniCare would integrate directly with a hospital's existing HMS (Hospital Management System) using Webhooks or a REST API. When a patient is assigned to a bed or discharged in the hospital's internal system, their server would send a POST request to our OmniCare backend. We would then dynamically calculate the load percentage by dividing the active beds by the total capacity of the hospital. We could also use IoT sensors on hospital beds to automate this."
+
+
+------------------------------------------------------
+5. ANSWERING: "HOW DID YOU USE GIT & GITHUB?"
+------------------------------------------------------
+"We used Git for local version control and GitHub for remote repository management. Instead of losing code or dealing with multiple zip files, we used Git to snap checkpoints of our progress. 
+
+We separated our codebase logically—one folder for the React.js frontend and one for the Express.js Backend. Whenever we successfully built a new feature, like the Blood Donor module, we committed the changes with descriptive messages and pushed them to GitHub. 
+
+This ensured our code was safely backed up, protected us from breaking existing features when experimenting, and acted as our single source of truth for the entire OmniCare application. It also prevented merge conflicts and allowed us to easily roll back our code if an API test failed."

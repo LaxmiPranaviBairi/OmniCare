@@ -1,0 +1,103 @@
+=======================================================
+OMNICARE - PRESENTATION SLIDES CONTENT
+=======================================================
+Use the content below for your PowerPoint slides. 
+Keep the text on the slides brief, and use the elaborations as your speaking notes!
+
+-------------------------------------------------------
+SLIDE 1: Introduction
+-------------------------------------------------------
+[Title]: Introduction to OmniCare
+[Bullet Points]:
+- OmniCare is a centralized, comprehensive healthcare web platform.
+- Designed to bridge the gap between patients, doctors, hospitals, and blood donors.
+- Eliminates the need for multiple fragmented healthcare applications by providing an "all-in-one" health dashboard.
+
+-------------------------------------------------------
+SLIDE 2: Literature Survey
+-------------------------------------------------------
+[Title]: Literature Survey
+[Bullet Points]:
+- Traditional healthcare systems rely on siloed data environments.
+- Studies show critical delays occur during emergencies due to a lack of live hospital bed availability data.
+- Existing blood donation platforms often suffer from poor localized matching and slow response times.
+- State-of-the-art web architectures (like the MERN stack) have proven effective in managing real-time healthcare data efficiently.
+
+-------------------------------------------------------
+SLIDE 3: Existing System
+-------------------------------------------------------
+[Title]: The Existing System
+[Bullet Points]:
+- Fragmented Applications: Patients use separate apps to book doctors, find hospitals, and locate blood donors.
+- Static Information: Hospital directories online only provide phone numbers, not real-time capacity or live load percentages.
+- Delayed Responses: Finding a specific blood type in an emergency relies heavily on word-of-mouth or unverified social media posts rather than a structured network.
+
+-------------------------------------------------------
+SLIDE 4: Problem Statement
+-------------------------------------------------------
+[Title]: Problem Statement
+[Text]:
+"During medical emergencies, patients and their families lose critical, life-saving time struggling to navigate multiple uncoordinated systems to find available hospital beds, specific blood donors, or specialized doctors."
+
+-------------------------------------------------------
+SLIDE 5: Proposed System
+-------------------------------------------------------
+[Title]: Proposed System: OmniCare
+[Bullet Points]:
+- A unified platform that combines all major healthcare requirements into a single portal.
+- Features Live-Load Tracking: Monitors nearby hospitals to show real-time occupancy.
+- Integrated Doctor Search: Search, filter, and instantly book appointments with local specialists.
+- Direct Blood Donor Network: Filter localized donors by blood type and send instant donation requests.
+
+-------------------------------------------------------
+SLIDE 6: Objectives
+-------------------------------------------------------
+[Title]: Project Objectives
+[Bullet Points]:
+1. To reduce critical delay times during medical emergencies using live hospital load tracking.
+2. To seamlessly connect patients with available blood donors in their immediate vicinity.
+3. To digitize and streamline the doctor appointment booking process.
+4. To provide patients with a single, secure dashboard to manage vitals and medical records.
+
+-------------------------------------------------------
+SLIDE 7: Methodology
+-------------------------------------------------------
+[Title]: Development Methodology
+[Bullet Points]:
+- Agile Software Development: Iterative building of frontend features and backend APIs.
+- UI/UX Design Phase: Emphasized accessibility, clean interfaces, and responsive design for mobile and desktop.
+- Backend Architecture: Built RESTful APIs to handle requests asynchronously.
+- Data Modeling: Created relational schemas in MongoDB for Appointments, Doctors, Hospitals, and Donors.
+
+-------------------------------------------------------
+SLIDE 8: Technologies Used
+-------------------------------------------------------
+[Title]: Technologies Used
+[Bullet Points]:
+- Frontend Web Framework: React.js (via Next.js)
+- Styling & UI: Tailwind CSS & Lucide Icons
+- Server Runtime: Node.js
+- API Framework: Express.js
+- Database: MongoDB (NoSQL) & Mongoose ODM
+- Version Control: Git & GitHub
+
+-------------------------------------------------------
+SLIDE 9: Results & Conclusion
+-------------------------------------------------------
+[Title]: Results achieved
+[Bullet Points]:
+- Successfully developed and deployed the OmniCare centralized dashboard.
+- Implemented functional, end-to-end REST API communication between the frontend client and MongoDB database.
+- Designed an intuitive UI that successfully handles asynchronous tasks like doctor bookings and blood requests.
+- Conclusion: OmniCare successfully demonstrates how modern web technologies can be used to unify fragmented healthcare services.
+
+-------------------------------------------------------
+SLIDE 10: References
+-------------------------------------------------------
+[Title]: References
+[Bullet Points]:
+1. Next.js Official Documentation. (Retrieved from nextjs.org)
+2. MongoDB Node.js Driver & Mongoose Documentation. (Retrieved from mongoosejs.com)
+3. Express.js API Reference Guide. (Retrieved from expressjs.com)
+4. Tailwind CSS Framework Documentation. (Retrieved from tailwindcss.com)
+5. Principles of RESTful API Design. (General Software Architecture Guidelines)

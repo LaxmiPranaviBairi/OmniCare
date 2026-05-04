@@ -31,7 +31,7 @@ export function BloodDonors() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedGroup, setSelectedGroup] = useState("All");
+  const [selectedBloodGroup, setSelectedBloodGroup] = useState("All");
   const [requestedDonors, setRequestedDonors] = useState<string[]>([]);
   const [requestingId, setRequestingId] = useState<string | null>(null);
 
@@ -48,7 +48,6 @@ export function BloodDonors() {
     try {
       const params = new URLSearchParams();
       if (searchQuery) params.set("search", searchQuery);
-      if (selectedGroup !== "All") params.set("bloodGroup", selectedGroup);
       const res = await fetch(`http://127.0.0.1:5000/api/donors?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch donors");
       const data = await res.json();
@@ -58,7 +57,7 @@ export function BloodDonors() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, selectedGroup]);
+  }, [searchQuery]);
 
   useEffect(() => {
     const timer = setTimeout(fetchDonors, 300);
@@ -66,18 +65,19 @@ export function BloodDonors() {
   }, [fetchDonors]);
 
   const handleSendRequest = async (donor: Donor) => {
-    setRequestingId(donor._id);
+    const safeId = donor._id || `mock-${donor.name}`;
+    setRequestingId(safeId);
     try {
       const res = await fetch("http://127.0.0.1:5000/api/blood-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ donorId: donor._id, requesterName: "John Doe" }),
+        body: JSON.stringify({ donorId: safeId, requesterName: "John Doe" }),
       });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.message || "Request failed");
       }
-      setRequestedDonors((prev) => [...prev, donor._id]);
+      setRequestedDonors((prev) => [...prev, safeId]);
     } catch (err: any) {
       alert(err.message || "Failed to send request.");
     } finally {
@@ -146,21 +146,26 @@ export function BloodDonors() {
         </div>
 
         {/* Blood Group Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-6">
-          {bloodGroups.map((group) => (
-            <button
-              key={group}
-              onClick={() => setSelectedGroup(group)}
-              className={`flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${
-                selectedGroup === group
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "border-border bg-card hover:bg-accent"
-              }`}
-            >
-              {group === "All" ? "All Groups" : group}
-            </button>
-          ))}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-foreground mb-2">Filter by Blood Group</label>
+          <select
+            value={selectedBloodGroup}
+            onChange={(e) => setSelectedBloodGroup(e.target.value)}
+            className="w-full sm:w-64 rounded-xl border border-border bg-card px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary shadow-sm appearance-none"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: `right 0.5rem center`, backgroundRepeat: `no-repeat`, backgroundSize: `1.5em 1.5em` }}
+          >
+            {bloodGroups.map((group) => (
+              <option key={group} value={group}>
+                {group === "All" ? "All Groups" : group}
+              </option>
+            ))}
+          </select>
         </div>
+        
+        {(() => {
+          const filteredDonors = donors.filter((d) => selectedBloodGroup === "All" || d.bloodGroup === selectedBloodGroup);
+          return (
+            <>
 
         {/* Loading Skeletons */}
         {isLoading && (
@@ -197,9 +202,9 @@ export function BloodDonors() {
         {/* Donor List */}
         {!isLoading && !error && (
           <div className="space-y-3">
-            {donors.map((donor) => (
+            {filteredDonors.map((donor, index) => (
               <div
-                key={donor._id}
+                key={donor._id || donor.name || index}
                 className="bg-card rounded-2xl border border-border p-4 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-4">
@@ -233,7 +238,7 @@ export function BloodDonors() {
                     </div>
                   </div>
                   <div className="flex-shrink-0">
-                    {requestedDonors.includes(donor._id) ? (
+                    {requestedDonors.includes(donor._id || `mock-${donor.name}`) ? (
                       <Button variant="outline" className="rounded-2xl" disabled>
                         <Check className="h-4 w-4 mr-1" />
                         Requested
@@ -242,9 +247,9 @@ export function BloodDonors() {
                       <Button
                         className="rounded-2xl"
                         onClick={() => handleSendRequest(donor)}
-                        disabled={requestingId === donor._id}
+                        disabled={requestingId === (donor._id || `mock-${donor.name}`)}
                       >
-                        {requestingId === donor._id ? (
+                        {requestingId === (donor._id || `mock-${donor.name}`) ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           "Send Request"
@@ -262,14 +267,19 @@ export function BloodDonors() {
           </div>
         )}
 
-        {!isLoading && !error && donors.length === 0 && (
-          <div className="text-center py-12">
+        {!isLoading && !error && filteredDonors.length === 0 && (
+          <div className="text-center py-12 border border-dashed border-border rounded-2xl bg-card/50">
             <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
               <Droplets className="h-8 w-8 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground">No donors found matching your criteria.</p>
+            <p className="text-foreground mb-1 font-medium">No donors currently available for this blood group.</p>
+            <p className="text-sm text-muted-foreground">We will notify you when a match registers.</p>
           </div>
         )}
+        
+        </>
+        );
+      })()}
 
         {/* Become a Donor CTA */}
         <div className="mt-8 p-6 bg-gradient-to-r from-rose-500 to-red-500 rounded-2xl text-white">
