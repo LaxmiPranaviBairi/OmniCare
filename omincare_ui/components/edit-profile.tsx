@@ -5,6 +5,7 @@ import { ArrowLeft, Loader2, Check, AlertCircle } from "lucide-react";
 
 interface EditProfileProps {
   onNavigate: (page: string) => void;
+  onProfileUpdate?: (updatedUser: any) => void;
 }
 
 interface FormState {
@@ -16,7 +17,7 @@ interface FormState {
 
 type SaveStatus = "idle" | "loading" | "success" | "error";
 
-export function EditProfile({ onNavigate }: EditProfileProps) {
+export function EditProfile({ onNavigate, onProfileUpdate }: EditProfileProps) {
   const [form, setForm] = useState<FormState>({
     name: "",
     email: "",
@@ -31,7 +32,15 @@ export function EditProfile({ onNavigate }: EditProfileProps) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch("https://omnicare-6244.onrender.com/api/profile");
+        const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
+        const user = userStr ? JSON.parse(userStr) : null;
+        const userId = user?._id;
+        
+        const url = userId 
+          ? `https://omnicare-6244.onrender.com/api/profile?userId=${userId}`
+          : "https://omnicare-6244.onrender.com/api/profile";
+
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Failed to load profile");
         const data = await res.json();
         setForm({
@@ -65,13 +74,41 @@ export function EditProfile({ onNavigate }: EditProfileProps) {
     setSaveStatus("loading");
     setErrorMsg(null);
     try {
-      const res = await fetch("https://omnicare-6244.onrender.com/api/profile", {
+      const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
+      const user = userStr ? JSON.parse(userStr) : null;
+      const userId = user?._id;
+
+      const res = await fetch("https://omnicare-6244.onrender.com/api/users/update", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          userId,
+          ...form,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Update failed");
+
+      // Update local storage immediately with the new user details so changes reflect instantly
+      if (user) {
+        const updatedUser = {
+          ...user,
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          bloodGroup: form.bloodGroup,
+        };
+        localStorage.setItem("omnicare_user", JSON.stringify(updatedUser));
+        if (localStorage.getItem("user")) {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        }
+
+        // Notify parent component about the updated profile details so state changes instantly
+        if (onProfileUpdate) {
+          onProfileUpdate(updatedUser);
+        }
+      }
+
       setSaveStatus("success");
       // Reset back to idle after 2.5s
       setTimeout(() => setSaveStatus("idle"), 2500);

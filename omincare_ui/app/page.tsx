@@ -18,16 +18,16 @@ import { DoctorDashboard } from "@/components/doctor-dashboard";
 export default function OmniCarePage() {
   const router = useRouter();
   const [activePage, setActivePage] = useState("home");
-  const [userName, setUserName] = useState("John Doe");
+  const [userName, setUserName] = useState("User");
 
   useEffect(() => {
-    const userStr = localStorage.getItem("omnicare_user");
+    const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
     if (!userStr) {
       router.push("/login");
     } else {
       try {
         const user = JSON.parse(userStr);
-        setUserName(user.name);
+        setUserName(user.name || user.email || "User");
       } catch (e) {
         // ignore
       }
@@ -51,7 +51,14 @@ export default function OmniCarePage() {
         {activePage === "donors" && <BloodDonors />}
         {activePage === "profile" && <Profile onNavigate={setActivePage} />}
         {activePage === "appointments" && <Appointments />}
-        {activePage === "edit-profile" && <EditProfile onNavigate={setActivePage} />}
+        {activePage === "edit-profile" && (
+          <EditProfile 
+            onNavigate={setActivePage} 
+            onProfileUpdate={(updatedUser) => {
+              setUserName(updatedUser.name || updatedUser.email || "User");
+            }}
+          />
+        )}
         {activePage === "medical-records" && <MedicalRecords onNavigate={setActivePage} />}
         {activePage === "doctor" && <DoctorDashboard onNavigate={setActivePage} />}
       </main>

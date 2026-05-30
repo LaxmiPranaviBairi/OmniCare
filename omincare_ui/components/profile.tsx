@@ -79,7 +79,15 @@ export function Profile({ onNavigate }: ProfileProps) {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch("https://omnicare-6244.onrender.com/api/profile");
+        const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
+        const user = userStr ? JSON.parse(userStr) : null;
+        const userId = user?._id;
+
+        const url = userId
+          ? `https://omnicare-6244.onrender.com/api/profile?userId=${userId}`
+          : "https://omnicare-6244.onrender.com/api/profile";
+
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Failed to load profile");
         const data = await res.json();
         setProfile(data);

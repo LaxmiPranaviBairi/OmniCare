@@ -25,6 +25,8 @@ const User = mongoose.model('User', new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['patient', 'doctor'], default: 'patient' },
+  phone: String,
+  bloodGroup: String,
   hospital: String,
   specialization: String,
 }, { timestamps: true }));
@@ -470,36 +472,138 @@ let profileData = {
 // GET /api/profile
 app.get('/api/profile', async (req, res) => {
   try {
+    const { userId } = req.query;
+    let userDetails = null;
+
+    if (userId && mongoose.connection.readyState === 1) {
+      if (mongoose.Types.ObjectId.isValid(userId)) {
+        userDetails = await User.findById(userId);
+      }
+    }
+
     let appointmentCount = 0;
     if (mongoose.connection.readyState !== 1) {
       const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'mock_data', 'appointments.json')));
       appointmentCount = data.filter(d => d.status === 'confirmed').length;
     } else {
-      appointmentCount = await Appointment.countDocuments({ status: 'confirmed' });
+      // Find appointments specifically for this user's name if they exist
+      const patientName = userDetails ? userDetails.name : null;
+      if (patientName) {
+        appointmentCount = await Appointment.countDocuments({ patientName, status: 'confirmed' });
+      } else {
+        appointmentCount = await Appointment.countDocuments({ status: 'confirmed' });
+      }
     }
     
-    res.json({
-      ...profileData,
+    // Construct the response profile
+    const profile = {
+      _id: userDetails ? userDetails._id : null,
+      name: userDetails ? userDetails.name : profileData.name,
+      email: userDetails ? userDetails.email : profileData.email,
+      phone: userDetails ? (userDetails.phone || "") : profileData.phone,
+      bloodGroup: userDetails ? (userDetails.bloodGroup || "O+") : profileData.bloodGroup,
+      image: profileData.image,
       stats: {
         heartRate: 72,
         bloodPressure: "120/80",
         appointmentCount,
       }
+    };
+    
+    res.json(profile);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// PUT /api/profile — update profile details (supporting both global and user-specific updates)
+app.put('/api/profile', async (req, res) => {
+  try {
+    const { userId, name, email, phone, bloodGroup } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ message: 'Name and email are required.' });
+    }
+
+    if (userId && mongoose.connection.readyState === 1) {
+      if (mongoose.Types.ObjectId.isValid(userId)) {
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { name, email, phone, bloodGroup },
+          { new: true }
+        );
+        if (updatedUser) {
+          return res.json({
+            message: 'Profile updated successfully!',
+            user: {
+              _id: updatedUser._id,
+              name: updatedUser.name,
+              email: updatedUser.email,
+              phone: updatedUser.phone,
+              bloodGroup: updatedUser.bloodGroup,
+              role: updatedUser.role
+            }
+          });
+        }
+      }
+    }
+
+    // Fallback to updating global profileData if not authenticated / offline
+    profileData = { ...profileData, name, email, phone, bloodGroup };
+    res.json({ 
+      message: 'Profile updated successfully!', 
+      profile: profileData,
+      user: { _id: userId || 'mock-id', name, email, phone, bloodGroup }
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// PUT /api/profile — update profile details
-app.put('/api/profile', (req, res) => {
+// PUT /api/users/update — update user details in MongoDB
+app.put('/api/users/update', async (req, res) => {
   try {
-    const { name, email, phone, bloodGroup } = req.body;
+    const { userId, name, email, phone, bloodGroup } = req.body;
+    if (!userId) {
+      return res.status(400).json({ message: 'userId is required.' });
+    }
     if (!name || !email) {
       return res.status(400).json({ message: 'Name and email are required.' });
     }
-    profileData = { ...profileData, name, email, phone, bloodGroup };
-    res.json({ message: 'Profile updated successfully!', profile: profileData });
+
+    if (mongoose.connection.readyState !== 1) {
+      // Offline Mode update
+      profileData = { ...profileData, name, email, phone, bloodGroup };
+      return res.json({ 
+        message: 'Profile updated successfully (Offline Mode)!', 
+        user: { _id: userId, name, email, phone, bloodGroup } 
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: 'Invalid user ID format.' });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, email, phone, bloodGroup },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    res.json({
+      message: 'Profile updated successfully!',
+      user: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        bloodGroup: updatedUser.bloodGroup,
+        role: updatedUser.role
+      }
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -68,10 +68,14 @@ export function BloodDonors() {
     const safeId = donor._id || `mock-${donor.name}`;
     setRequestingId(safeId);
     try {
+      const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
+      const user = userStr ? JSON.parse(userStr) : null;
+      const requesterName = user?.name || user?.email || "User";
+
       const res = await fetch("https://omnicare-6244.onrender.com/api/blood-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ donorId: safeId, requesterName: "John Doe" }),
+        body: JSON.stringify({ donorId: safeId, requesterName }),
       });
       if (!res.ok) {
         const data = await res.json();
