@@ -296,7 +296,7 @@ app.get('/api/donors', async (req, res) => {
     const donors = users.map(user => ({
       _id: user._id,
       name: user.name,
-      bloodGroup: user.bloodGroup || "O+", // Fallback blood group
+      bloodGroup: user.bloodGroup || "Not Set", // Fallback blood group
       location: user.hospital || "", // Fallback location (or hospital details)
       distance: "N/A",
       lastDonation: "", // Fallback last donation date (will trigger UI fallback text)

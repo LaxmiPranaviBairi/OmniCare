@@ -214,24 +214,28 @@ export function BloodDonors() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold text-foreground truncate">{donor.name}</h3>
-                      <span
-                        className={`px-2 py-0.5 text-xs font-bold rounded-full ${
-                          donor.bloodGroup.includes("-")
-                            ? "bg-red-100 text-red-700"
-                            : "bg-rose-100 text-rose-700"
-                        }`}
-                      >
-                        {donor.bloodGroup}
-                      </span>
+                      {donor.bloodGroup && donor.bloodGroup !== "Not Set" && donor.bloodGroup !== "N/A" ? (
+                        <span
+                          className={`px-2 py-0.5 text-xs font-bold rounded-full ${
+                            donor.bloodGroup.includes("-")
+                              ? "bg-red-100 text-red-700"
+                              : "bg-rose-100 text-rose-700"
+                          }`}
+                        >
+                          {donor.bloodGroup}
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 text-xs font-bold rounded-full bg-slate-100 text-slate-500">
+                          Not Set
+                        </span>
+                      )}
                     </div>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5" />
-                        {donor.location || "Location pending"}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Droplets className="h-3.5 w-3.5" />
-                        Last donated: {donor.lastDonation || "New Donor"}
+                        {!donor.location || donor.location.trim() === "" || donor.location === "(N/A)" || donor.location === "N/A"
+                          ? "Location: Community Member"
+                          : `Location: ${donor.location}`}
                       </span>
                     </div>
                   </div>
