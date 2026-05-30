@@ -5,10 +5,6 @@ import {
   User,
   FileText,
   Calendar,
-  Bell,
-  CreditCard,
-  HelpCircle,
-  Settings,
   LogOut,
   ChevronRight,
   Heart,
@@ -217,26 +213,6 @@ export function Profile({ onNavigate }: ProfileProps) {
               description="Upcoming and past bookings"
               onClick={() => onNavigate('appointments')}
             />
-            <MenuItem
-              icon={Bell}
-              label="Notifications"
-              description="Manage your alerts"
-            />
-            <MenuItem
-              icon={CreditCard}
-              label="Payment History"
-              description="View your transactions"
-            />
-            <MenuItem
-              icon={HelpCircle}
-              label="Help & Support"
-              description="Get assistance"
-            />
-            <MenuItem
-              icon={Settings}
-              label="Settings"
-              description="App preferences"
-            />
           </div>
 
           <div className="border-t border-border p-2">
@@ -244,6 +220,13 @@ export function Profile({ onNavigate }: ProfileProps) {
               icon={LogOut}
               label="Log Out"
               danger
+              onClick={() => {
+                localStorage.removeItem("omnicare_user");
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                window.location.href = "/login";
+              }}
             />
           </div>
         </div>
