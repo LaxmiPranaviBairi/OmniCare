@@ -177,7 +177,6 @@ export function BloodDonors() {
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="animate-pulse bg-card rounded-2xl border border-border p-4 shadow-sm">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-slate-200 flex-shrink-0" />
                   <div className="flex-1 space-y-2">
                     <div className="h-4 bg-slate-200 rounded w-1/3" />
                     <div className="h-3 bg-slate-100 rounded w-1/2" />
@@ -212,11 +211,6 @@ export function BloodDonors() {
                 className="bg-card rounded-2xl border border-border p-4 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-4">
-                  <img
-                    src={donor.image}
-                    alt={donor.name}
-                    className="w-14 h-14 rounded-full object-cover flex-shrink-0"
-                  />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold text-foreground truncate">{donor.name}</h3>
@@ -233,11 +227,11 @@ export function BloodDonors() {
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5" />
-                        {donor.location} ({donor.distance})
+                        {donor.location || "Location pending"}
                       </span>
                       <span className="flex items-center gap-1">
                         <Droplets className="h-3.5 w-3.5" />
-                        Last donated: {donor.lastDonation}
+                        Last donated: {donor.lastDonation || "New Donor"}
                       </span>
                     </div>
                   </div>

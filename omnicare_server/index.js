@@ -288,7 +288,22 @@ app.get('/api/donors', async (req, res) => {
     if (bloodGroup && bloodGroup !== 'All') {
       query.bloodGroup = bloodGroup;
     }
-    const donors = await Donor.find(query);
+
+    // Query registered users in MongoDB
+    const users = await User.find(query);
+    
+    // Map them to the donor format
+    const donors = users.map(user => ({
+      _id: user._id,
+      name: user.name,
+      bloodGroup: user.bloodGroup || "O+", // Fallback blood group
+      location: user.hospital || "", // Fallback location (or hospital details)
+      distance: "N/A",
+      lastDonation: "", // Fallback last donation date (will trigger UI fallback text)
+      available: true,
+      phone: user.phone || ""
+    }));
+
     res.json(donors);
   } catch (err) {
     res.status(500).json({ message: err.message });
