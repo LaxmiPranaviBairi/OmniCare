@@ -223,9 +223,14 @@ export function HospitalSearch() {
                   >
                     <Clock className="h-3 w-3" /> Book Appointment
                   </button>
-                  <button className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90 flex items-center gap-2 shadow-sm">
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${hospital.name}, ${hospital.location}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90 flex items-center gap-2 shadow-sm"
+                  >
                     <Navigation className="h-3 w-3" /> Get Directions
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
