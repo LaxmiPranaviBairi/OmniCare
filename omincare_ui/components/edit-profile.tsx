@@ -13,6 +13,7 @@ interface FormState {
   email: string;
   phone: string;
   bloodGroup: string;
+  profilePic: string;
 }
 
 type SaveStatus = "idle" | "loading" | "success" | "error";
@@ -23,6 +24,7 @@ export function EditProfile({ onNavigate, onProfileUpdate }: EditProfileProps) {
     email: "",
     phone: "",
     bloodGroup: "O+",
+    profilePic: "",
   });
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -48,6 +50,7 @@ export function EditProfile({ onNavigate, onProfileUpdate }: EditProfileProps) {
           email: data.email ?? "",
           phone: data.phone ?? "",
           bloodGroup: data.bloodGroup ?? "O+",
+          profilePic: data.profilePic ?? data.image ?? "",
         });
       } catch {
         // silently fall back to empty defaults
@@ -97,6 +100,7 @@ export function EditProfile({ onNavigate, onProfileUpdate }: EditProfileProps) {
           email: form.email,
           phone: form.phone,
           bloodGroup: form.bloodGroup,
+          profilePic: form.profilePic,
         };
         localStorage.setItem("omnicare_user", JSON.stringify(updatedUser));
         if (localStorage.getItem("user")) {
@@ -134,13 +138,37 @@ export function EditProfile({ onNavigate, onProfileUpdate }: EditProfileProps) {
           {/* Avatar */}
           <div className="flex items-center gap-4">
             <img
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face"
+              src={form.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(form.name || "User")}&background=0D8ABC&color=fff&size=200`}
               alt="Profile"
               className="w-20 h-20 rounded-full object-cover border-4 border-primary/20"
             />
-            <button className="px-4 py-2 text-sm rounded-xl border border-border hover:bg-accent transition-colors font-medium">
+            <input
+              type="file"
+              accept="image/*"
+              id="profile-pic-upload"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  if (file.size > 1024 * 1024) {
+                    alert("Please select an image smaller than 1MB.");
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    const base64String = reader.result as string;
+                    setForm(prev => ({ ...prev, profilePic: base64String }));
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+            />
+            <label
+              htmlFor="profile-pic-upload"
+              className="px-4 py-2 text-sm rounded-xl border border-border hover:bg-accent transition-colors font-medium cursor-pointer bg-card border-slate-200 text-slate-700 inline-block"
+            >
               Change Photo
-            </button>
+            </label>
           </div>
 
           {/* Skeleton while loading */}

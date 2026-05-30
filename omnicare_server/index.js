@@ -27,6 +27,7 @@ const User = mongoose.model('User', new mongoose.Schema({
   role: { type: String, enum: ['patient', 'doctor'], default: 'patient' },
   phone: String,
   bloodGroup: String,
+  profilePic: String,
   hospital: String,
   specialization: String,
 }, { timestamps: true }));
@@ -502,7 +503,8 @@ app.get('/api/profile', async (req, res) => {
       email: userDetails ? userDetails.email : profileData.email,
       phone: userDetails ? (userDetails.phone || "") : profileData.phone,
       bloodGroup: userDetails ? (userDetails.bloodGroup || "O+") : profileData.bloodGroup,
-      image: profileData.image,
+      profilePic: userDetails ? (userDetails.profilePic || "") : "",
+      image: userDetails && userDetails.profilePic ? userDetails.profilePic : profileData.image,
       stats: {
         heartRate: 72,
         bloodPressure: "120/80",
@@ -519,7 +521,7 @@ app.get('/api/profile', async (req, res) => {
 // PUT /api/profile — update profile details (supporting both global and user-specific updates)
 app.put('/api/profile', async (req, res) => {
   try {
-    const { userId, name, email, phone, bloodGroup } = req.body;
+    const { userId, name, email, phone, bloodGroup, profilePic } = req.body;
     if (!name || !email) {
       return res.status(400).json({ message: 'Name and email are required.' });
     }
@@ -528,7 +530,7 @@ app.put('/api/profile', async (req, res) => {
       if (mongoose.Types.ObjectId.isValid(userId)) {
         const updatedUser = await User.findByIdAndUpdate(
           userId,
-          { name, email, phone, bloodGroup },
+          { name, email, phone, bloodGroup, profilePic },
           { new: true }
         );
         if (updatedUser) {
@@ -540,6 +542,7 @@ app.put('/api/profile', async (req, res) => {
               email: updatedUser.email,
               phone: updatedUser.phone,
               bloodGroup: updatedUser.bloodGroup,
+              profilePic: updatedUser.profilePic,
               role: updatedUser.role
             }
           });
@@ -549,10 +552,11 @@ app.put('/api/profile', async (req, res) => {
 
     // Fallback to updating global profileData if not authenticated / offline
     profileData = { ...profileData, name, email, phone, bloodGroup };
+    if (profilePic) profileData.image = profilePic;
     res.json({ 
       message: 'Profile updated successfully!', 
       profile: profileData,
-      user: { _id: userId || 'mock-id', name, email, phone, bloodGroup }
+      user: { _id: userId || 'mock-id', name, email, phone, bloodGroup, profilePic }
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -562,7 +566,7 @@ app.put('/api/profile', async (req, res) => {
 // PUT /api/users/update — update user details in MongoDB
 app.put('/api/users/update', async (req, res) => {
   try {
-    const { userId, name, email, phone, bloodGroup } = req.body;
+    const { userId, name, email, phone, bloodGroup, profilePic } = req.body;
     if (!userId) {
       return res.status(400).json({ message: 'userId is required.' });
     }
@@ -573,9 +577,10 @@ app.put('/api/users/update', async (req, res) => {
     if (mongoose.connection.readyState !== 1) {
       // Offline Mode update
       profileData = { ...profileData, name, email, phone, bloodGroup };
+      if (profilePic) profileData.image = profilePic;
       return res.json({ 
         message: 'Profile updated successfully (Offline Mode)!', 
-        user: { _id: userId, name, email, phone, bloodGroup } 
+        user: { _id: userId, name, email, phone, bloodGroup, profilePic } 
       });
     }
 
@@ -585,7 +590,7 @@ app.put('/api/users/update', async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { name, email, phone, bloodGroup },
+      { name, email, phone, bloodGroup, profilePic },
       { new: true }
     );
 
@@ -601,6 +606,7 @@ app.put('/api/users/update', async (req, res) => {
         email: updatedUser.email,
         phone: updatedUser.phone,
         bloodGroup: updatedUser.bloodGroup,
+        profilePic: updatedUser.profilePic,
         role: updatedUser.role
       }
     });

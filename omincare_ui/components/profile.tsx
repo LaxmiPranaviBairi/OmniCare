@@ -54,6 +54,7 @@ interface UserProfile {
   phone: string;
   bloodGroup: string;
   image: string;
+  profilePic?: string;
   stats: {
     heartRate: number;
     bloodPressure: string;
@@ -146,7 +147,7 @@ export function Profile({ onNavigate }: ProfileProps) {
         <div className="bg-card rounded-2xl border border-border p-6 mb-6 shadow-sm">
           <div className="flex items-center gap-4 mb-6">
             <img
-              src={profile.image}
+              src={profile.profilePic || (profile.image && !profile.image.includes("unsplash.com") ? profile.image : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || "User")}&background=0D8ABC&color=fff&size=200`)}
               alt={profile.name}
               className="w-20 h-20 rounded-full object-cover border-4 border-primary/20"
             />
