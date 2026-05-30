@@ -41,6 +41,18 @@ export function BloodDonors() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
+    if (userStr) {
+      try {
+        setCurrentUser(JSON.parse(userStr));
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
 
   const fetchDonors = useCallback(async () => {
     setIsLoading(true);
@@ -97,16 +109,43 @@ export function BloodDonors() {
     setIsRegistering(true);
     setRegisterError(null);
     try {
-      const res = await fetch("https://omnicare-6244.onrender.com/api/donors/register", {
-        method: "POST",
+      const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
+      const user = userStr ? JSON.parse(userStr) : null;
+      const userId = user?._id;
+
+      const res = await fetch("https://omnicare-6244.onrender.com/api/users/update", {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(registerForm),
+        body: JSON.stringify({
+          userId,
+          name: registerForm.name,
+          bloodGroup: registerForm.bloodGroup,
+          phone: registerForm.phone || user?.phone || "",
+          email: user?.email || ""
+        }),
       });
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.message || "Registration failed");
       }
+
+      if (user) {
+        const updatedUser = {
+          ...user,
+          name: registerForm.name,
+          bloodGroup: registerForm.bloodGroup,
+          phone: registerForm.phone || user?.phone || "",
+        };
+        localStorage.setItem("omnicare_user", JSON.stringify(updatedUser));
+        if (localStorage.getItem("user")) {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        }
+        setCurrentUser(updatedUser);
+      }
+
       setRegisterSuccess(true);
+      fetchDonors();
+
       setTimeout(() => {
         setShowRegister(false);
         setRegisterSuccess(false);
@@ -283,21 +322,48 @@ export function BloodDonors() {
         );
       })()}
 
-        {/* Become a Donor CTA */}
-        <div className="mt-8 p-6 bg-gradient-to-r from-rose-500 to-red-500 rounded-2xl text-white">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h3 className="text-xl font-semibold mb-1">Become a Blood Donor</h3>
-              <p className="text-white/80">Your donation can save up to 3 lives. Register today!</p>
+        {/* Become a Donor CTA or Registered Thank You Banner */}
+        {(() => {
+          const isRegisteredDonor = !!(currentUser?.bloodGroup && currentUser.bloodGroup !== "Not Set" && currentUser.bloodGroup !== "N/A" && currentUser.bloodGroup.trim() !== "");
+          return isRegisteredDonor ? (
+            <div className="mt-8 p-6 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl text-white shadow-sm">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-semibold mb-1">Thank you for being a registered donor!</h3>
+                  <p className="text-white/80">Your profile details indicate you are an active life saver. We appreciate your support!</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center justify-center bg-white/25 px-3.5 py-1.5 rounded-xl text-sm font-semibold border border-white/20">
+                    Registered Group: {currentUser.bloodGroup}
+                  </span>
+                </div>
+              </div>
             </div>
-            <Button
-              className="bg-white text-rose-600 hover:bg-white/90 rounded-2xl"
-              onClick={() => setShowRegister(true)}
-            >
-              Register as Donor
-            </Button>
-          </div>
-        </div>
+          ) : (
+            <div className="mt-8 p-6 bg-gradient-to-r from-rose-500 to-red-500 rounded-2xl text-white">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-semibold mb-1">Become a Blood Donor</h3>
+                  <p className="text-white/80">Your donation can save up to 3 lives. Register today!</p>
+                </div>
+                <Button
+                  className="bg-white text-rose-600 hover:bg-white/90 rounded-2xl"
+                  onClick={() => {
+                    setRegisterForm({
+                      name: currentUser?.name || "",
+                      bloodGroup: "A+",
+                      location: currentUser?.hospital || "",
+                      phone: currentUser?.phone || ""
+                    });
+                    setShowRegister(true);
+                  }}
+                >
+                  Register as Donor
+                </Button>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Registration Modal */}
