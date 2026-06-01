@@ -116,6 +116,16 @@ export function HospitalSearch() {
         throw new Error('Failed to fetch hospital data');
       }
       const data = await res.json();
+      
+      // Override first two entries for live demo as requested
+      if (data.length >= 2) {
+        data[0].name = "Apollo Hospitals";
+        data[0].location = "Jubilee Hills, Hyderabad";
+        
+        data[1].name = "AIG Hospitals";
+        data[1].location = "Gachibowli, Hyderabad";
+      }
+      
       setHospitals(data);
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
