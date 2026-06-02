@@ -41,7 +41,91 @@ export function DoctorSearch() {
       if (selectedSpecialty !== "All") params.set("specialty", selectedSpecialty);
       const res = await fetch(`https://omnicare-6244.onrender.com/api/doctors?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch doctors");
-      const data = await res.json();
+      let data = await res.json();
+      
+      // Override with realistic mocked data if API returns less than 5 doctors (for live demo)
+      if (data.length < 5) {
+        data = [
+          {
+            _id: "doc1",
+            name: "Dr. Ananya Reddy",
+            specialty: "Cardiologist",
+            image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
+            rating: 4.9,
+            reviews: 127,
+            location: "Apollo Hospitals, Jubilee Hills",
+            status: "available",
+            experience: "15 years"
+          },
+          {
+            _id: "doc2",
+            name: "Dr. Vikram Sharma",
+            specialty: "Neurologist",
+            image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200&h=200&fit=crop&crop=face",
+            rating: 4.8,
+            reviews: 98,
+            location: "AIG Hospitals, Gachibowli",
+            status: "busy",
+            experience: "12 years"
+          },
+          {
+            _id: "doc3",
+            name: "Dr. Priya Patel",
+            specialty: "Pediatrician",
+            image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=200&h=200&fit=crop&crop=face",
+            rating: 4.9,
+            reviews: 215,
+            location: "Apollo Hospitals, Jubilee Hills",
+            status: "available",
+            experience: "10 years"
+          },
+          {
+            _id: "doc4",
+            name: "Dr. Ramesh Rao",
+            specialty: "Orthopedic",
+            image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200&h=200&fit=crop&crop=face",
+            rating: 4.7,
+            reviews: 89,
+            location: "AIG Hospitals, Gachibowli",
+            status: "high-demand",
+            experience: "18 years"
+          },
+          {
+            _id: "doc5",
+            name: "Dr. Neha Singh",
+            specialty: "Dermatologist",
+            image: "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=200&h=200&fit=crop&crop=face",
+            rating: 4.8,
+            reviews: 156,
+            location: "Apollo Hospitals, Jubilee Hills",
+            status: "available",
+            experience: "8 years"
+          },
+          {
+            _id: "doc6",
+            name: "Dr. Amit Kumar",
+            specialty: "General Medicine",
+            image: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=200&h=200&fit=crop&crop=face",
+            rating: 4.6,
+            reviews: 234,
+            location: "AIG Hospitals, Gachibowli",
+            status: "busy",
+            experience: "20 years"
+          }
+        ];
+        
+        // Apply basic frontend filtering since we're mocking
+        if (searchQuery) {
+          data = data.filter((d: any) => 
+            d.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            d.specialty.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        if (selectedSpecialty !== "All") {
+          data = data.filter((d: any) => d.specialty === selectedSpecialty);
+        }
+      }
+      
       setDoctors(data);
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");

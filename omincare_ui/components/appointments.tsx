@@ -29,16 +29,18 @@ export function Appointments() {
     try {
       const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
       let patientName = "Guest";
+      let userId = "";
       if (userStr) {
         try {
           const user = JSON.parse(userStr);
-          patientName = user.name || "Guest";
+          patientName = user.name || user.email || "Guest";
+          userId = user._id || user.id || "";
         } catch (e) {
           patientName = "Guest";
         }
       }
 
-      const res = await fetch(`https://omnicare-6244.onrender.com/api/appointments?patientName=${encodeURIComponent(patientName)}`);
+      const res = await fetch(`https://omnicare-6244.onrender.com/api/appointments?userId=${encodeURIComponent(userId)}&patientName=${encodeURIComponent(patientName)}`);
       if (!res.ok) throw new Error("Failed to fetch appointments");
       const data = await res.json();
       setAppointments(data);

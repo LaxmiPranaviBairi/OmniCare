@@ -79,6 +79,7 @@ export function BookingModal({ isOpen, onClose, doctor }: BookingModalProps) {
       const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
       const user = userStr ? JSON.parse(userStr) : null;
       const patientName = user?.name || user?.email || "User";
+      const userId = user?._id || user?.id || "";
 
       const res = await fetch("https://omnicare-6244.onrender.com/api/appointments", {
         method: "POST",
@@ -89,6 +90,7 @@ export function BookingModal({ isOpen, onClose, doctor }: BookingModalProps) {
           doctorSpecialty: doctor.specialty,
           doctorImage: doctor.image,
           patientName: patientName,
+          userId: userId,
           hospital: doctor.hospital || doctor.location || "N/A",
           date: selectedDate,
           time: selectedTime,
