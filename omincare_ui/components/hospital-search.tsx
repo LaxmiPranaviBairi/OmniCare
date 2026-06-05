@@ -138,6 +138,22 @@ export function HospitalSearch() {
     fetchHospitals();
   }, []);
 
+  // Simulated Live-Load Tracking
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHospitals(prev => 
+        prev.map(h => {
+          const change = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, 2
+          let newLoad = (h.load_percent || 0) + change;
+          if (newLoad < 0) newLoad = 0;
+          if (newLoad > 100) newLoad = 100;
+          return { ...h, load_percent: newLoad };
+        })
+      );
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
       {successMsg && (

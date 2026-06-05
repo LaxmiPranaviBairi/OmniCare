@@ -24,6 +24,17 @@ export function DoctorDashboard({ onNavigate }: DoctorDashboardProps) {
   const router = useRouter();
   const [availableBeds, setAvailableBeds] = useState(4);
   const [hospitalId, setHospitalId] = useState<string | null>(null);
+  const [doctorName, setDoctorName] = useState("Dr. Smith");
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('omnicare_user') || localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.name) setDoctorName(`Dr. ${user.name}`);
+      } catch (e) {}
+    }
+  }, []);
 
   useEffect(() => {
     // Fetch the hospital details when component mounts
@@ -111,7 +122,7 @@ export function DoctorDashboard({ onNavigate }: DoctorDashboardProps) {
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-primary">Doctor Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Welcome back, Dr. Smith. Here's your schedule for today.</p>
+          <p className="text-muted-foreground mt-1">Welcome back, {doctorName}. Here's your schedule for today.</p>
         </div>
         <Button 
           variant="outline" 
@@ -135,7 +146,7 @@ export function DoctorDashboard({ onNavigate }: DoctorDashboardProps) {
             <Clock className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">24</div>
+            <div className="text-2xl font-bold text-primary">{appointments.length}</div>
             <p className="text-xs text-muted-foreground mt-1">+2 from yesterday</p>
           </CardContent>
         </Card>
@@ -148,8 +159,8 @@ export function DoctorDashboard({ onNavigate }: DoctorDashboardProps) {
             <Users className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">12</div>
-            <p className="text-xs text-muted-foreground mt-1">8 remaining</p>
+            <div className="text-2xl font-bold text-primary">{appointments.filter(a => a.status !== "Completed").length}</div>
+            <p className="text-xs text-muted-foreground mt-1">{appointments.filter(a => a.status !== "Completed").length} remaining</p>
           </CardContent>
         </Card>
 

@@ -1,8 +1,9 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Activity, LayoutDashboard, Search, Hospital, Droplets, User, LogOut, Calendar } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 interface NavbarProps {
   onNavigate: (page: string) => void
@@ -10,6 +11,18 @@ interface NavbarProps {
 
 export function Navbar({ onNavigate }: NavbarProps) {
   const router = useRouter()
+  const pathname = usePathname()
+  const [userName, setUserName] = useState("Profile")
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('omnicare_user') || localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.name) setUserName(user.name.split(' ')[0]);
+      } catch (e) {}
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('user')
@@ -48,9 +61,15 @@ export function Navbar({ onNavigate }: NavbarProps) {
             <Droplets className="h-4 w-4 text-red-500" /> Donors
           </button>
           <div className="w-px h-6 bg-border mx-2 hidden md:block"></div>
-          <Link href="/doctor" className="transition-colors hover:text-primary flex items-center gap-1 font-semibold text-primary">
-            <User className="h-4 w-4" /> Doctor Portal
-          </Link>
+          {pathname === '/doctor' ? (
+            <Link href="/" className="transition-colors hover:text-primary flex items-center gap-1 font-semibold text-primary">
+              <User className="h-4 w-4" /> Patient View
+            </Link>
+          ) : (
+            <Link href="/doctor" className="transition-colors hover:text-primary flex items-center gap-1 font-semibold text-primary">
+              <User className="h-4 w-4" /> Doctor Portal
+            </Link>
+          )}
         </div>
 
         {/* User Actions */}
@@ -61,7 +80,7 @@ export function Navbar({ onNavigate }: NavbarProps) {
             className="flex items-center gap-2 rounded-full border p-1 px-3 hover:bg-muted transition-colors"
           >
             <User className="h-4 w-4" />
-            <span className="text-xs">Profile</span>
+            <span className="text-xs">{userName}</span>
           </button>
           
           {/* Logout Button */}

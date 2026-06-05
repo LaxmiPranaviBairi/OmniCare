@@ -21,14 +21,14 @@ interface Doctor {
   experience: string;
 }
 
-const SPECIALTIES = ["All", "Cardiologist", "Neurologist", "Pediatrician", "Dermatologist", "Orthopedic"];
+const SPECIALTIES = ["All Specialties", "Cardiologist", "Neurologist", "Pediatrician", "Orthopedic", "Dermatologist", "General Medicine"];
 
 export function DoctorSearch() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSpecialty, setSelectedSpecialty] = useState("All");
+  const [selectedSpecialty, setSelectedSpecialty] = useState("All Specialties");
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -38,7 +38,7 @@ export function DoctorSearch() {
     try {
       const params = new URLSearchParams();
       if (searchQuery) params.set("search", searchQuery);
-      if (selectedSpecialty !== "All") params.set("specialty", selectedSpecialty);
+      if (selectedSpecialty !== "All Specialties") params.set("specialty", selectedSpecialty);
       const res = await fetch(`https://omnicare-6244.onrender.com/api/doctors?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch doctors");
       let data = await res.json();
@@ -121,7 +121,7 @@ export function DoctorSearch() {
             d.specialty.toLowerCase().includes(searchQuery.toLowerCase())
           );
         }
-        if (selectedSpecialty !== "All") {
+        if (selectedSpecialty !== "All Specialties") {
           data = data.filter((d: any) => d.specialty === selectedSpecialty);
         }
       }
