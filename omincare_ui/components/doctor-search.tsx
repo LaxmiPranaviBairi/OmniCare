@@ -23,11 +23,15 @@ interface Doctor {
 
 const SPECIALTIES = ["All Specialties", "Cardiologist", "Neurologist", "Pediatrician", "Orthopedic", "Dermatologist", "General Medicine"];
 
-export function DoctorSearch() {
+interface DoctorSearchProps {
+  initialSearch?: string;
+}
+
+export function DoctorSearch({ initialSearch }: DoctorSearchProps) {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearch || "");
   const [selectedSpecialty, setSelectedSpecialty] = useState("All Specialties");
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

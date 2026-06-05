@@ -19,6 +19,14 @@ export default function OmniCarePage() {
   const router = useRouter();
   const [activePage, setActivePage] = useState("home");
   const [userName, setUserName] = useState("User");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleNavigate = (page: string, query?: string) => {
+    if (query !== undefined) {
+      setSearchQuery(query);
+    }
+    setActivePage(page);
+  };
 
   useEffect(() => {
     const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
@@ -45,8 +53,8 @@ export default function OmniCarePage() {
           </Link>
         </div>
 
-        {activePage === "home" && <HomeDashboard onNavigate={setActivePage} userName={userName} />}
-        {activePage === "doctors" && <DoctorSearch />}
+        {activePage === "home" && <HomeDashboard onNavigate={handleNavigate} userName={userName} />}
+        {activePage === "doctors" && <DoctorSearch initialSearch={searchQuery} />}
         {activePage === "hospitals" && <HospitalSearch />}
         {activePage === "donors" && <BloodDonors />}
         {activePage === "profile" && <Profile onNavigate={setActivePage} />}

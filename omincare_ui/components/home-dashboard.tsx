@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Search, Hospital, Droplets, Calendar, Stethoscope, Clock, Phone, Mail, Activity } from "lucide-react"
 
 interface HomeDashboardProps {
-  onNavigate: (page: string) => void
+  onNavigate: (page: string, query?: string) => void
   userName: string
 }
 
@@ -49,7 +49,7 @@ export function HomeDashboard({ onNavigate, userName }: HomeDashboardProps) {
             className="relative mt-8 max-w-xl"
             onSubmit={(e) => {
               e.preventDefault();
-              onNavigate('doctors');
+              onNavigate('doctors', searchQuery);
             }}
           >
             <button type="submit" className="absolute left-4 top-1/2 -translate-y-1/2 focus:outline-none">
