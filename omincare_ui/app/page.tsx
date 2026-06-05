@@ -20,9 +20,12 @@ export default function OmniCarePage() {
   const [activePage, setActivePage] = useState("home");
   const [userName, setUserName] = useState("User");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDoctorName, setSelectedDoctorName] = useState("");
 
   const handleNavigate = (page: string, query?: string) => {
-    if (query !== undefined) {
+    if (page === 'appointments' && query) {
+      setSelectedDoctorName(query);
+    } else if (query !== undefined) {
       setSearchQuery(query);
     }
     setActivePage(page);
@@ -54,11 +57,11 @@ export default function OmniCarePage() {
         </div>
 
         {activePage === "home" && <HomeDashboard onNavigate={handleNavigate} userName={userName} />}
-        {activePage === "doctors" && <DoctorSearch initialSearch={searchQuery} />}
+        {activePage === "doctors" && <DoctorSearch initialSearch={searchQuery} onNavigate={handleNavigate} />}
         {activePage === "hospitals" && <HospitalSearch />}
         {activePage === "donors" && <BloodDonors />}
         {activePage === "profile" && <Profile onNavigate={setActivePage} />}
-        {activePage === "appointments" && <Appointments />}
+        {activePage === "appointments" && <Appointments selectedDoctorName={selectedDoctorName} />}
         {activePage === "edit-profile" && (
           <EditProfile 
             onNavigate={setActivePage} 

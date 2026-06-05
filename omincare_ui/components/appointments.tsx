@@ -18,10 +18,28 @@ const statusStyles = {
   Pending: "bg-yellow-100 text-yellow-700",
 };
 
-export function Appointments() {
+interface AppointmentsProps {
+  selectedDoctorName?: string;
+}
+
+export function Appointments({ selectedDoctorName }: AppointmentsProps) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Booking Form State
+  const [bookingDoctor, setBookingDoctor] = useState(selectedDoctorName || "");
+  const [bookingDate, setBookingDate] = useState("");
+  const [bookingTime, setBookingTime] = useState("");
+  const [isBooking, setIsBooking] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedDoctorName) {
+      setBookingDoctor(selectedDoctorName);
+    }
+  }, [selectedDoctorName]);
 
   const fetchAppointments = async () => {
     setIsLoading(true);
@@ -57,12 +75,114 @@ export function Appointments() {
 
   return (
     <section id="appointments" className="py-8 animate-in slide-in-from-bottom-4 duration-500">
-      <div className="container mx-auto px-4 max-w-2xl">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">My Appointments</h2>
-            <p className="text-muted-foreground">Your upcoming and past bookings</p>
-          </div>
+      <div className="container mx-auto px-4 max-w-2xl space-y-8">
+        
+        {/* New Appointment Form */}
+        <div className="bg-card rounded-3xl border border-border p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-foreground mb-4">Schedule New Appointment</h2>
+          {bookingSuccess ? (
+            <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-2xl flex items-center gap-3">
+              <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
+              <div>
+                <p className="font-bold">Booking Confirmed!</p>
+                <p className="text-sm text-green-600 mt-1">Your appointment with {bookingDoctor} is set for {bookingDate} at {bookingTime}.</p>
+              </div>
+            </div>
+          ) : (
+            <form 
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setIsBooking(true);
+                setBookingError(null);
+                try {
+                  const userStr = localStorage.getItem("omnicare_user") || localStorage.getItem("user");
+                  const user = userStr ? JSON.parse(userStr) : null;
+                  const patientName = user?.name || user?.email || "Guest";
+                  const userId = user?._id || user?.id || "";
+
+                  const res = await fetch("https://omnicare-6244.onrender.com/api/appointments", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      doctorId: `mock-${bookingDoctor}`,
+                      doctorName: bookingDoctor,
+                      patientName: patientName,
+                      userId: userId,
+                      hospital: "OmniCare Partner Clinic",
+                      date: bookingDate,
+                      time: bookingTime,
+                    }),
+                  });
+
+                  if (!res.ok) throw new Error("Failed to book appointment");
+                  
+                  setBookingSuccess(true);
+                  fetchAppointments(); // refresh list
+                  setTimeout(() => {
+                    setBookingSuccess(false);
+                    setBookingDoctor("");
+                    setBookingDate("");
+                    setBookingTime("");
+                  }, 4000);
+                } catch (err: any) {
+                  setBookingError(err.message || "Booking failed");
+                } finally {
+                  setIsBooking(false);
+                }
+              }} 
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">Doctor's Name</label>
+                <input 
+                  type="text" 
+                  required
+                  value={bookingDoctor}
+                  onChange={(e) => setBookingDoctor(e.target.value)}
+                  placeholder="e.g. Dr. Sarah Jenkins"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 bg-slate-50 focus:bg-white transition-colors"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-foreground mb-2">Date</label>
+                  <input 
+                    type="date" 
+                    required
+                    value={bookingDate}
+                    onChange={(e) => setBookingDate(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 bg-slate-50 focus:bg-white transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-foreground mb-2">Time</label>
+                  <input 
+                    type="time" 
+                    required
+                    value={bookingTime}
+                    onChange={(e) => setBookingTime(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 bg-slate-50 focus:bg-white transition-colors"
+                  />
+                </div>
+              </div>
+              {bookingError && <p className="text-red-500 text-sm font-medium">{bookingError}</p>}
+              <button 
+                type="submit" 
+                disabled={isBooking || !bookingDoctor || !bookingDate || !bookingTime}
+                className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {isBooking ? "Booking..." : "Confirm Appointment"}
+              </button>
+            </form>
+          )}
+        </div>
+
+        <div>
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">My Appointments</h2>
+              <p className="text-muted-foreground">Your upcoming and past bookings</p>
+            </div>
           <button
             onClick={fetchAppointments}
             disabled={isLoading}
@@ -153,6 +273,7 @@ export function Appointments() {
             ))}
           </div>
         )}
+        </div>
       </div>
     </section>
   );

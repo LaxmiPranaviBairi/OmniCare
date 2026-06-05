@@ -1,295 +1,201 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Search, Star, MapPin, RefreshCw, AlertCircle } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Search, Star, MapPin, CalendarClock, IndianRupee, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LiveStatusBadge } from "@/components/live-status-badge";
-import { BookingModal } from "@/components/booking-modal";
-
-type Status = "available" | "busy" | "high-demand";
-
-interface Doctor {
-  _id: string;
-  name: string;
-  specialty: string;
-  image: string;
-  rating: number;
-  reviews: number;
-  location: string;
-  status: Status;
-  experience: string;
-}
-
-const SPECIALTIES = ["All Specialties", "Cardiologist", "Neurologist", "Pediatrician", "Orthopedic", "Dermatologist", "General Medicine"];
 
 interface DoctorSearchProps {
   initialSearch?: string;
+  onNavigate?: (page: string, query?: string) => void;
 }
 
-export function DoctorSearch({ initialSearch }: DoctorSearchProps) {
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const MOCK_DOCTORS = [
+  { id: "1", name: "Dr. Ananya Reddy", specialty: "Cardiology", rating: 4.9, reviews: 127, experience: "15 years", fees: "₹800", location: "Apollo Hospitals, Jubilee Hills", availability: "Today" },
+  { id: "2", name: "Dr. Vikram Sharma", specialty: "Neurology", rating: 4.8, reviews: 98, experience: "12 years", fees: "₹1000", location: "AIG Hospitals, Gachibowli", availability: "Tomorrow" },
+  { id: "3", name: "Dr. Priya Patel", specialty: "Pediatrics", rating: 4.9, reviews: 215, experience: "10 years", fees: "₹600", location: "Apollo Hospitals, Jubilee Hills", availability: "Today" },
+  { id: "4", name: "Dr. Ramesh Rao", specialty: "Orthopedics", rating: 4.7, reviews: 89, experience: "18 years", fees: "₹900", location: "AIG Hospitals, Gachibowli", availability: "Tomorrow" },
+  { id: "5", name: "Dr. Neha Singh", specialty: "Dermatology", rating: 4.8, reviews: 156, experience: "8 years", fees: "₹700", location: "Apollo Hospitals, Jubilee Hills", availability: "Today" },
+  { id: "6", name: "Dr. Amit Kumar", specialty: "General Medicine", rating: 4.6, reviews: 234, experience: "20 years", fees: "₹500", location: "AIG Hospitals, Gachibowli", availability: "Today" },
+  { id: "7", name: "Dr. Sneha Desai", specialty: "Gynecology", rating: 4.9, reviews: 312, experience: "14 years", fees: "₹850", location: "KIMS Hospital, Secunderabad", availability: "Tomorrow" },
+  { id: "8", name: "Dr. Rajesh Iyer", specialty: "Ophthalmology", rating: 4.7, reviews: 145, experience: "11 years", fees: "₹650", location: "LV Prasad Eye Institute", availability: "Today" },
+  { id: "9", name: "Dr. Kavita Verma", specialty: "Dentistry", rating: 4.8, reviews: 198, experience: "9 years", fees: "₹400", location: "Care Hospitals, Banjara Hills", availability: "Tomorrow" },
+  { id: "10", name: "Dr. Suresh Menon", specialty: "Psychiatry", rating: 4.9, reviews: 87, experience: "16 years", fees: "₹1200", location: "MindCare Clinic, Madhapur", availability: "Today" },
+];
+
+const SPECIALTIES = ["All", "Cardiology", "Neurology", "Pediatrics", "Orthopedics", "Dermatology", "General Medicine", "Gynecology", "Ophthalmology", "Dentistry", "Psychiatry"];
+const AVAILABILITY = ["All", "Today", "Tomorrow"];
+
+export function DoctorSearch({ initialSearch, onNavigate }: DoctorSearchProps) {
   const [searchQuery, setSearchQuery] = useState(initialSearch || "");
-  const [selectedSpecialty, setSelectedSpecialty] = useState("All Specialties");
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSpecialty, setSelectedSpecialty] = useState("All");
+  const [selectedAvailability, setSelectedAvailability] = useState("All");
 
-  const fetchDoctors = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams();
-      if (searchQuery) params.set("search", searchQuery);
-      if (selectedSpecialty !== "All Specialties") params.set("specialty", selectedSpecialty);
-      const res = await fetch(`https://omnicare-6244.onrender.com/api/doctors?${params.toString()}`);
-      if (!res.ok) throw new Error("Failed to fetch doctors");
-      let data = await res.json();
+  const filteredDoctors = useMemo(() => {
+    return MOCK_DOCTORS.filter(doc => {
+      const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            doc.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSpecialty = selectedSpecialty === "All" || doc.specialty === selectedSpecialty;
+      const matchesAvailability = selectedAvailability === "All" || doc.availability === selectedAvailability;
       
-      // Override with realistic mocked data if API returns less than 5 doctors (for live demo)
-      if (data.length < 5) {
-        data = [
-          {
-            _id: "doc1",
-            name: "Dr. Ananya Reddy",
-            specialty: "Cardiologist",
-            image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
-            rating: 4.9,
-            reviews: 127,
-            location: "Apollo Hospitals, Jubilee Hills",
-            status: "available",
-            experience: "15 years"
-          },
-          {
-            _id: "doc2",
-            name: "Dr. Vikram Sharma",
-            specialty: "Neurologist",
-            image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200&h=200&fit=crop&crop=face",
-            rating: 4.8,
-            reviews: 98,
-            location: "AIG Hospitals, Gachibowli",
-            status: "busy",
-            experience: "12 years"
-          },
-          {
-            _id: "doc3",
-            name: "Dr. Priya Patel",
-            specialty: "Pediatrician",
-            image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=200&h=200&fit=crop&crop=face",
-            rating: 4.9,
-            reviews: 215,
-            location: "Apollo Hospitals, Jubilee Hills",
-            status: "available",
-            experience: "10 years"
-          },
-          {
-            _id: "doc4",
-            name: "Dr. Ramesh Rao",
-            specialty: "Orthopedic",
-            image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200&h=200&fit=crop&crop=face",
-            rating: 4.7,
-            reviews: 89,
-            location: "AIG Hospitals, Gachibowli",
-            status: "high-demand",
-            experience: "18 years"
-          },
-          {
-            _id: "doc5",
-            name: "Dr. Neha Singh",
-            specialty: "Dermatologist",
-            image: "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=200&h=200&fit=crop&crop=face",
-            rating: 4.8,
-            reviews: 156,
-            location: "Apollo Hospitals, Jubilee Hills",
-            status: "available",
-            experience: "8 years"
-          },
-          {
-            _id: "doc6",
-            name: "Dr. Amit Kumar",
-            specialty: "General Medicine",
-            image: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=200&h=200&fit=crop&crop=face",
-            rating: 4.6,
-            reviews: 234,
-            location: "AIG Hospitals, Gachibowli",
-            status: "busy",
-            experience: "20 years"
-          }
-        ];
-        
-        // Apply basic frontend filtering since we're mocking
-        if (searchQuery) {
-          data = data.filter((d: any) => 
-            d.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-            d.specialty.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-        }
-        if (selectedSpecialty !== "All Specialties") {
-          data = data.filter((d: any) => d.specialty === selectedSpecialty);
-        }
-      }
-      
-      setDoctors(data);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
-    } finally {
-      setIsLoading(false);
+      return matchesSearch && matchesSpecialty && matchesAvailability;
+    });
+  }, [searchQuery, selectedSpecialty, selectedAvailability]);
+
+  const handleBookNow = (doctorName: string) => {
+    if (onNavigate) {
+      onNavigate('appointments', doctorName);
     }
-  }, [searchQuery, selectedSpecialty]);
-
-  useEffect(() => {
-    const timer = setTimeout(fetchDoctors, 300); // debounce search
-    return () => clearTimeout(timer);
-  }, [fetchDoctors]);
-
-  const handleBookNow = (doctor: Doctor) => {
-    setSelectedDoctor(doctor);
-    setIsModalOpen(true);
   };
 
   return (
-    <section id="doctors" className="py-8 bg-muted/30">
+    <section className="py-8 animate-in fade-in duration-500">
       <div className="container mx-auto px-4">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">Find Doctors</h2>
-            <p className="text-muted-foreground">Search and book appointments with top specialists</p>
-          </div>
-          <button
-            onClick={fetchDoctors}
-            disabled={isLoading}
-            className="flex items-center gap-2 rounded-xl border bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50 disabled:opacity-50 transition-colors shadow-sm"
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin text-primary" : "text-slate-500"}`} />
-            <span className="hidden sm:inline">Refresh</span>
-          </button>
+        
+        {/* Header */}
+        <div className="mb-8 border-b pb-6">
+          <h2 className="text-3xl font-extrabold text-slate-900">Find Specialists</h2>
+          <p className="text-slate-500 mt-2 text-lg">Browse our directory of top-rated healthcare professionals.</p>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative mb-6">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search by name or specialty..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 pr-4 py-6 rounded-2xl border-border bg-card text-base"
-          />
-        </div>
-
-        {/* Specialty Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-6">
-          {SPECIALTIES.map((specialty) => (
-            <button
-              key={specialty}
-              onClick={() => setSelectedSpecialty(specialty)}
-              className={`flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${
-                selectedSpecialty === specialty
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "border-border bg-card hover:bg-primary hover:text-primary-foreground hover:border-primary"
-              }`}
-            >
-              {specialty}
-            </button>
-          ))}
-        </div>
-
-        {/* Loading Skeletons */}
-        {isLoading && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="animate-pulse bg-card rounded-2xl border border-border p-4 shadow-sm">
-                <div className="flex gap-4">
-                  <div className="w-20 h-20 rounded-2xl bg-slate-200 flex-shrink-0" />
-                  <div className="flex-1 space-y-2 pt-1">
-                    <div className="h-5 bg-slate-200 rounded w-3/4" />
-                    <div className="h-4 bg-slate-100 rounded w-1/2" />
-                    <div className="h-3 bg-slate-100 rounded w-1/3" />
-                  </div>
-                </div>
-                <div className="mt-4 h-10 bg-slate-200 rounded-2xl" />
+        <div className="flex flex-col lg:flex-row gap-8">
+          
+          {/* Sidebar Filters */}
+          <div className="w-full lg:w-1/4 space-y-8">
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+              <div className="flex items-center gap-2 mb-4 font-bold text-slate-800">
+                <Filter className="w-5 h-5 text-primary" />
+                Filters
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* Error State */}
-        {!isLoading && error && (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-8 text-red-600 text-center">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <div>
-              <p className="font-bold text-lg">Failed to load doctors</p>
-              <p className="text-sm text-red-500">{error}</p>
-            </div>
-            <button onClick={fetchDoctors} className="mt-2 rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700">
-              Try Again
-            </button>
-          </div>
-        )}
-
-        {/* Doctor Cards */}
-        {!isLoading && !error && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {doctors.map((doctor, index) => (
-              <div
-                key={doctor._id || doctor.name || index}
-                className="bg-card rounded-2xl border border-border p-4 shadow-sm hover:shadow-lg transition-shadow"
-              >
-                <div className="flex gap-4">
-                  <img
-                    src={doctor.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.name || "Doctor")}&background=random`}
-                    alt={doctor.name || "Doctor"}
-                    className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
+              
+              {/* Search */}
+              <div className="mb-6">
+                <label className="text-sm font-semibold text-slate-700 mb-2 block">Search</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    type="search"
+                    placeholder="Doctor name..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 rounded-xl border-slate-200 bg-slate-50 focus:bg-white transition-colors"
                   />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <h3 className="font-semibold text-foreground truncate">{doctor.name}</h3>
-                      <LiveStatusBadge status={doctor.status} showLabel={false} />
-                    </div>
-                    <p className="text-sm text-primary font-medium mb-1">{doctor.specialty || "General Medicine"}</p>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {doctor.experience ? `${doctor.experience} experience` : 'Experience: N/A'}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                        <span className="font-medium text-foreground">{doctor.rating || 'New Doctor'}</span>
-                        {doctor.reviews ? <span className="text-muted-foreground">({doctor.reviews})</span> : null}
+                </div>
+              </div>
+
+              {/* Specialty */}
+              <div className="mb-6">
+                <label className="text-sm font-semibold text-slate-700 mb-2 block">Specialty</label>
+                <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                  {SPECIALTIES.map(specialty => (
+                    <label key={specialty} className="flex items-center gap-3 cursor-pointer group">
+                      <input 
+                        type="radio" 
+                        name="specialty" 
+                        value={specialty}
+                        checked={selectedSpecialty === specialty}
+                        onChange={(e) => setSelectedSpecialty(e.target.value)}
+                        className="w-4 h-4 text-primary focus:ring-primary border-slate-300"
+                      />
+                      <span className={`text-sm ${selectedSpecialty === specialty ? 'font-semibold text-slate-900' : 'text-slate-600 group-hover:text-slate-900'} transition-colors`}>
+                        {specialty}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Availability */}
+              <div>
+                <label className="text-sm font-semibold text-slate-700 mb-2 block">Availability</label>
+                <div className="flex bg-slate-100 p-1 rounded-xl">
+                  {AVAILABILITY.map(avail => (
+                    <button
+                      key={avail}
+                      onClick={() => setSelectedAvailability(avail)}
+                      className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${selectedAvailability === avail ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+                    >
+                      {avail}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="w-full lg:w-3/4">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="font-semibold text-slate-700">{filteredDoctors.length} results found</span>
+            </div>
+
+            {filteredDoctors.length === 0 ? (
+              <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
+                <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-slate-800 mb-2">No doctors found</h3>
+                <p className="text-slate-500">Try adjusting your filters or search query.</p>
+                <button 
+                  onClick={() => { setSearchQuery(""); setSelectedSpecialty("All"); setSelectedAvailability("All"); }}
+                  className="mt-6 text-primary font-semibold hover:underline"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredDoctors.map((doc) => (
+                  <div key={doc.id} className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 flex flex-col group">
+                    <div className="flex items-start gap-4 mb-4">
+                      {/* Initials Badge */}
+                      <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xl flex-shrink-0 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                        {doc.name.replace('Dr. ', '').split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-slate-900 leading-tight group-hover:text-primary transition-colors">{doc.name}</h3>
+                        <p className="text-sm font-medium text-slate-500 mt-1">{doc.specialty}</p>
+                        
+                        <div className="flex items-center gap-1 mt-2">
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          <span className="font-bold text-sm text-slate-800">{doc.rating}</span>
+                          <span className="text-xs text-slate-500">({doc.reviews})</span>
+                        </div>
                       </div>
                     </div>
+
+                    <div className="space-y-2 mt-2 mb-6 flex-1">
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <CalendarClock className="w-4 h-4 text-slate-400" />
+                        <span className="font-medium text-slate-900">{doc.experience}</span> experience
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <IndianRupee className="w-4 h-4 text-slate-400" />
+                        <span className="font-medium text-slate-900">{doc.fees}</span> consultation fee
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <MapPin className="w-4 h-4 text-slate-400" />
+                        <span className="truncate">{doc.location}</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-100 mt-auto flex items-center justify-between">
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${doc.availability === 'Today' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                        Available {doc.availability}
+                      </span>
+                      <Button 
+                        onClick={() => handleBookNow(doc.name)}
+                        className="rounded-xl shadow-sm hover:shadow-md transition-all font-semibold"
+                      >
+                        Book Now
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-1 mt-3 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  <span className="truncate">{doctor.location}</span>
-                </div>
-                <Button
-                  className="w-full mt-4 rounded-2xl"
-                  onClick={() => handleBookNow(doctor)}
-                >
-                  Book Now
-                </Button>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        )}
-
-        {!isLoading && !error && doctors.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No doctors found matching your criteria.</p>
-          </div>
-        )}
+        </div>
       </div>
-
-      {/* Booking Modal */}
-      {selectedDoctor && (
-        <BookingModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          doctor={selectedDoctor}
-        />
-      )}
     </section>
   );
 }
