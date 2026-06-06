@@ -34,17 +34,25 @@ export default function LoginPage() {
         throw new Error(data.message || "Failed to login");
       }
 
-      // Save to localStorage for session persistence
-      localStorage.setItem("omnicare_user", JSON.stringify(data.user));
-      toast.success(data.message);
+      // 2. SESSION STORAGE SYNC: robust user object preservation
+      const userData = data.user || { email, role, name: "User" };
+      localStorage.setItem("omnicare_user", JSON.stringify(userData));
+      localStorage.setItem("user", JSON.stringify(userData)); // Sync generic key as well
+      
+      try { toast.success(data.message || "Login successful"); } catch (e) {}
 
-      if (data.user.role === "doctor") {
+      // 1. CHECK REDIRECTION PATHS: ensure doctor role routes to dashboard
+      const activeRole = userData.role || role;
+      if (activeRole === "doctor") {
         router.push("/doctor-dashboard");
       } else {
         router.push("/");
       }
     } catch (err: any) {
-      toast.error(err.message || "Something went wrong.");
+      // 3. ERROR VISIBILITY: guarantee error is seen even if toast fails
+      const errorMsg = err.message || "Something went wrong during login.";
+      alert(errorMsg); 
+      try { toast.error(errorMsg); } catch (e) {}
     } finally {
       setLoading(false);
     }
